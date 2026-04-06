@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aura - Tu seguridad siempre contigo</title>
+    <meta name="description"
+        content="Aura es la pulsera inteligente con código QR único que protege a quienes más quieres.">
+
+    <!-- React & ReactDOM -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts: Satoshi and General Sans alternatives (Inter & Plus Jakarta Sans are reliable web fonts with similar vibes) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
+
+    <!-- Tailwind Config for Design System -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0F172A',
+                        secondary: '#1E3A8A',
+                        cta: '#CA8A04',
+                        background: '#FAFAFA',
+                        surface: '#FFFFFF',
+                        textPrimary: '#020617',
+                        textSecondary: '#475569',
+                        textMuted: '#94A3B8',
+                        borderSubtle: '#F1F5F9',
+                        borderMedium: '#E2E8F0',
+                    },
+                    fontFamily: {
+                        heading: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        body: ['"Inter"', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'glass': '0 8px 32px 0 rgba(15, 23, 42, 0.05)',
+                        'glass-hover': '0 12px 48px 0 rgba(15, 23, 42, 0.1)',
+                        'card': '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+                        'card-hover': '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+                    },
+                    transitionTimingFunction: {
+                        'spring': 'cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FAFAFA;
+            color: #020617;
+            overflow-x: hidden;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        /* Premium Liquid Glass Effects */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .premium-shadow {
+            box-shadow: 0 4px 24px -4px rgba(15, 23, 42, 0.04), 0 16px 40px -8px rgba(15, 23, 42, 0.08);
+            /* Sophisticated subtle shadow */
+        }
+
+        /* Hide scrollbar for clean horizontal scrolls if any */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .text-balance {
+            text-wrap: balance;
+        }
+    </style>
+</head>
+
+<body class="antialiased selection:bg-primary selection:text-white">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // ------------- ICONS (SVG inline for self-containment) -------------
+        const ChevronDown = ({ className = "w-5 h-5" }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="6 9 12 15 18 9"></polyline></svg>
+        );
+        const Star = ({ className = "w-4 h-4 text-cta", filled = true }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill={filled ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+        );
+        const Plus = ({ className = "w-5 h-5" }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        );
+        const Minus = ({ className = "w-5 h-5" }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        );
+        const ArrowRight = ({ className = "w-5 h-5" }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+        );
+        const ArrowLeft = ({ className = "w-5 h-5" }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        );
+        const Smartphone = ({ className = "w-4 h-4" }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+        );
+
+        // ------------- COMPONENTS -------------
+
+        const Button = ({ children, variant = "primary", className = "", href, ...props }) => {
+            const baseClasses = "inline-flex items-center justify-center font-medium rounded-full transition-all duration-300 ease-out cursor-pointer active:scale-95 px-6 py-3";
+            const variants = {
+                primary: "bg-primary text-white hover:bg-slate-800 hover:shadow-lg hover:-translate-y-0.5 shadow-md",
+                secondary: "bg-white text-primary border border-borderMedium hover:bg-slate-50 hover:shadow-md hover:border-slate-300 hover:-translate-y-0.5",
+                light: "bg-white text-primary hover:bg-slate-50 shadow-md hover:shadow-lg hover:-translate-y-0.5",
+                outline: "bg-transparent text-white border border-white/30 hover:bg-white/10 backdrop-blur-sm",
+            };
+            if (href) {
+                return (
+                    <a href={href} className={`${baseClasses} ${variants[variant]} ${className}`} {...props}>
+                        {children}
+                    </a>
+                );
+            }
+            return (
+                <button className={`${baseClasses} ${variants[variant]} ${className}`} {...props}>
+                    {children}
+                </button>
+            );
+        };
+
+        const Logo = ({ white = false }) => (
+            <div className={`flex items-center gap-1 font-heading font-bold text-2xl tracking-tighter ${white ? 'text-white' : 'text-primary'}`}>
+                <div className={`w-6 h-6 rounded-md flex items-center justify-center ${white ? 'bg-white text-primary' : 'bg-primary text-white'}`}>
+                    <span className="text-sm">A</span>
+                </div>
+                URA
+            </div>
+        );
+
+        const Navbar = () => {
+            const [scrolled, setScrolled] = useState(false);
+
+            useEffect(() => {
+                const handleScroll = () => setScrolled(window.scrollY > 20);
+                window.addEventListener('scroll', handleScroll);
+                return () => window.removeEventListener('scroll', handleScroll);
+            }, []);
+
+            return (
+                <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'py-3 bg-white/80 backdrop-blur-lg border-b border-borderSubtle shadow-sm' : 'py-5 bg-transparent'}`}>
+                    <div className="max-w-7xl mx-auto px-6 md:px-12 flex items-center justify-between">
+                        <Logo />
+                        <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-textSecondary">
+                            <a href="#como-funciona" className="hover:text-primary transition-colors cursor-pointer">Cómo funciona</a>
+                            <a href="#opiniones" className="hover:text-primary transition-colors cursor-pointer">Opiniones</a>
+                            <a href="#faq" className="hover:text-primary transition-colors cursor-pointer">FAQ</a>
+                        </nav>
+                        <Button href="https://mpago.la/14iTA4z" target="_blank" rel="noopener noreferrer" variant="primary" className="py-2.5 px-5 text-sm">Comprar ahora</Button>
+                    </div>
+                </header>
+            );
+        };
+
+        const Hero = () => {
+            return (
+                <section className="relative pt-32 pb-20 md:pt-40 md:pb-32 overflow-hidden">
+                    {/* Subtle Background Elements */}
+                    <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[50%] bg-blue-100/50 rounded-full blur-[100px] pointer-events-none"></div>
+                    <div className="absolute top-[20%] right-[-10%] w-[30%] h-[40%] bg-yellow-50/50 rounded-full blur-[80px] pointer-events-none"></div>
+
+                    <div className="max-w-7xl mx-auto px-6 md:px-12 grid lg:grid-cols-2 gap-12 lg:gap-8 items-center">
+                        <div className="flex flex-col items-start z-10">
+                            <h1 className="text-5xl md:text-6xl lg:text-[72px] font-heading font-extrabold leading-[1.1] tracking-tight text-primary mb-2">
+                                TU SEGURIDAD <br />
+                                <span className="text-textSecondary font-semibold">siempre contigo</span>
+                            </h1>
+                            <p className="mt-6 text-lg text-textSecondary max-w-lg leading-relaxed text-balance">
+                                Aura es la pulsera inteligente con código QR único que protege a quienes más quieres. Información médica vital a un escaneo de distancia.
+                            </p>
+
+                            <div className="mt-10 flex flex-wrap gap-4">
+                                <Button href="https://mpago.la/14iTA4z" target="_blank" rel="noopener noreferrer" variant="primary" className="text-base px-8">Comprar ahora</Button>
+                                <Button variant="secondary" className="text-base px-8">Activar mi pulsera</Button>
+                            </div>
+                        </div>
+
+                        {/* Product Image Showcase */}
+                        <div className="relative w-full aspect-square md:aspect-[4/3] max-w-md mx-auto lg:max-w-none lg:mx-0 z-10 group perspective">
+                            {/* Glowing backdrop matching the wristband color (orange/blue) */}
+                            <div className="absolute inset-4 bg-gradient-to-tr from-[#E17C5B]/40 to-[#1F2937]/30 rounded-[32px] blur-2xl group-hover:blur-3xl transition-all duration-700 opacity-60"></div>
+
+                            <div className="relative w-full h-full bg-gradient-to-b from-[#F3F4F6] to-[#E5E7EB] rounded-[32px] overflow-hidden premium-shadow transform group-hover:-translate-y-2 group-hover:rotate-1 transition-all duration-500 ease-out flex items-center justify-center border border-white/80">
+                                {/* Abstract Bracelet Representation / Placeholder since no image assets provided */}
+                                <div className="relative w-64 h-64">
+                                    <div className="absolute inset-0 border-[28px] border-[#1E3A8A] rounded-full transform -rotate-12 group-hover:rotate-0 transition-transform duration-700 shadow-xl clip-band"></div>
+                                    <div className="absolute inset-0 border-[28px] border-[#E88C6F] rounded-full transform -rotate-12 group-hover:rotate-0 transition-transform duration-700 shadow-inner clip-band-top z-10 flex items-center justify-center">
+                                        {/* QR Scan box representation */}
+                                        <div className="absolute top-[20%] right-[10%] w-12 h-16 bg-white rounded flex items-center justify-center shadow-md border border-gray-100 transform rotate-45">
+                                            <div className="w-8 h-8 border-2 border-dashed border-gray-800 rounded-sm"></div>
+                                        </div>
+                                    </div>
+                                    {/* Light reflections */}
+                                    <div className="absolute top-4 left-8 w-24 h-4 bg-white/20 rounded-full blur-sm transform -rotate-45 z-20"></div>
+                                </div>
+                            </div>
+
+                            {/* Floating Compatibility Badge */}
+                            <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 glass-panel rounded-full px-5 py-3 shadow-lg flex items-center gap-3 w-max transition-transform hover:-translate-y-1 cursor-default">
+                                <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center">
+                                    <Smartphone className="w-4 h-4" />
+                                </div>
+                                <div className="text-sm text-primary">
+                                    <p className="font-semibold leading-tight">Escaneo instantáneo</p>
+                                    <p className="text-xs text-textSecondary">Compatible con iPhone y Android</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        const Steps = () => {
+            const steps = [
+                {
+                    title: "Activa y Configura",
+                    desc: "Vincula la pulsera a nuestra web app con datos médicos, alergias y contactos de emergencia.",
+                    color: "bg-blue-50",
+                    delay: "0ms"
+                },
+                {
+                    title: "Entrega la pulsera",
+                    desc: "Ajusta la pulsera a la medida de su muñeca o de tu ser querido. Se activará en caso de emergencia.",
+                    color: "bg-orange-50",
+                    delay: "150ms"
+                },
+                {
+                    title: "Escaneo de auxilio",
+                    desc: "Si ocurre un incidente, cualquier persona puede escanear el QR y avisar a los familiares o contactarte.",
+                    color: "bg-slate-100",
+                    delay: "300ms"
+                }
+            ];
+
+            return (
+                <section id="como-funciona" className="py-24 bg-white relative">
+                    <div className="max-w-7xl mx-auto px-6 md:px-12 text-center">
+                        <h2 className="text-3xl md:text-4xl font-heading font-bold text-primary mb-4 tracking-tight">Tres pasos para tu tranquilidad</h2>
+                        <p className="text-textSecondary text-lg max-w-2xl mx-auto mb-16 text-balance">Desde que abres la caja hasta que tu ser querido está protegido.</p>
+
+                        <div className="grid md:grid-cols-3 gap-8">
+                            {steps.map((step, idx) => (
+                                <div key={idx} className="group flex flex-col items-start text-left bg-background rounded-2xl p-6 transition-all duration-300 hover:shadow-card-hover hover:-translate-y-1 border border-transparent hover:border-gray-100 cursor-pointer">
+                                    <div className={`w-full aspect-[4/3] rounded-xl mb-6 flex items-center justify-center overflow-hidden relative ${step.color}`}>
+                                        <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent mix-blend-overlay"></div>
+                                        {/* Mock UI for images inside grey boxes */}
+                                        <div className="w-20 h-20 rounded-2xl bg-white shadow-sm flex items-center justify-center text-2xl font-bold text-slate-300 group-hover:scale-110 transition-transform duration-500 ease-spring">
+                                            {idx + 1}
+                                        </div>
+                                    </div>
+                                    <h3 className="text-xl font-bold text-primary mb-3 font-heading group-hover:text-cta transition-colors">{step.title}</h3>
+                                    <p className="text-textSecondary leading-relaxed">{step.desc}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        const Testimonials = () => {
+            return (
+                <section id="opiniones" className="py-24 bg-background">
+                    <div className="max-w-7xl mx-auto px-6 md:px-12 grid lg:grid-cols-2 gap-16 items-center">
+                        <div className="max-w-md">
+                            <h2 className="text-3xl md:text-5xl font-heading font-bold text-primary mb-6 tracking-tight leading-tight">Que dicen nuestros<br />usuarios</h2>
+                            <p className="text-textSecondary text-lg leading-relaxed text-balance mb-8">
+                                Creado por pacientes, escuchamos y leemos a todos quienes se sienten más protegidos y tranquilos.
+                            </p>
+
+                            {/* Custom Navigation */}
+                            <div className="flex items-center gap-6">
+                                <div className="flex gap-2">
+                                    <div className="w-2 h-2 rounded-full bg-primary cursor-pointer transition-transform hover:scale-150"></div>
+                                    <div className="w-2 h-2 rounded-full bg-slate-300 cursor-pointer transition-transform hover:bg-slate-400"></div>
+                                    <div className="w-2 h-2 rounded-full bg-slate-300 cursor-pointer transition-transform hover:bg-slate-400"></div>
+                                    <div className="w-2 h-2 rounded-full bg-slate-300 cursor-pointer transition-transform hover:bg-slate-400"></div>
+                                </div>
+                                <div className="flex gap-4 ml-auto">
+                                    <button className="w-10 h-10 rounded-full border border-borderMedium flex items-center justify-center text-primary hover:bg-white hover:shadow-sm transition-all hover:scale-105 active:scale-95 cursor-pointer">
+                                        <ArrowLeft />
+                                    </button>
+                                    <button className="w-10 h-10 rounded-full border border-borderMedium flex items-center justify-center text-primary hover:bg-white hover:shadow-sm transition-all hover:scale-105 active:scale-95 cursor-pointer">
+                                        <ArrowRight />
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Testimonial Bento Card */}
+                        <div className="relative z-10 group cursor-pointer">
+                            <div className="absolute inset-0 bg-gradient-to-r from-yellow-200/20 to-orange-200/20 rounded-[32px] blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                            <div className="bg-white rounded-[24px] p-10 premium-shadow border border-gray-100 transform transition-all duration-300 group-hover:-translate-y-1 leading-relaxed">
+                                <div className="flex gap-1 mb-6">
+                                    {[1, 2, 3, 4, 5].map(i => <Star key={i} />)}
+                                </div>
+                                <p className="text-xl md:text-2xl text-primary font-medium mb-10 text-balance">
+                                    "Con Aura me siento tranquilo cuando mi padre sale a caminar. Sé que tiene demencia y alguna vez se nos ha perdido."
+                                </p>
+                                <div className="flex items-center gap-4">
+                                    <div className="w-12 h-12 rounded-full bg-slate-200 overflow-hidden shrink-0 shadow-inner">
+                                        <img src="https://i.pravatar.cc/150?img=47" alt="Avatar de Clara R." className="w-full h-full object-cover" />
+                                    </div>
+                                    <div>
+                                        <p className="font-bold text-primary font-heading">Clara R.</p>
+                                        <p className="text-sm text-textSecondary font-medium">Mamá</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        const FAQItem = ({ question, answer, isOpen, onClick }) => (
+            <div className={`border-b border-borderMedium last:border-0 transition-colors duration-300 ${isOpen ? 'bg-white rounded-xl shadow-sm border-transparent my-2 px-6 pb-2' : ''}`}>
+                <button
+                    className={`w-full py-6 flex items-center justify-between text-left focus:outline-none transition-colors group cursor-pointer ${!isOpen && 'hover:text-cta px-6'}`}
+                    onClick={onClick}
+                >
+                    <span className="font-semibold text-primary group-hover:text-cta transition-colors text-lg pr-8">{question}</span>
+                    <span className={`text-cta flex-shrink-0 transition-transform duration-300 ease-spring ${isOpen ? 'rotate-180 bg-orange-50 rounded-full p-1' : ''}`}>
+                        {isOpen ? <Minus /> : <Plus />}
+                    </span>
+                </button>
+                <div
+                    className={`overflow-hidden transition-all duration-300 ease-in-out px-6`}
+                    style={{ maxHeight: isOpen ? '200px' : '0', opacity: isOpen ? 1 : 0 }}
+                >
+                    <p className="text-textSecondary pb-6 leading-relaxed">
+                        {answer}
+                    </p>
+                </div>
+            </div>
+        );
+
+        const FAQ = () => {
+            const [openIdx, setOpenIdx] = useState(0);
+
+            const faqs = [
+                { q: "¿Necesito pagar una suscripción mensual?", a: "No. Tu compra inicial incluye acceso gratuito de por vida a las funciones básicas del escaneo médico. Ofrecemos planes Premium opcionales." },
+                { q: "¿Es resistente al agua?", a: "Sí, la pulsera Aura está certificada para resistir inmersiones, por lo que puedes bañarte o nadar con ella sin problemas." },
+                { q: "¿Es seguro para la piel?", a: "Nuestras pulseras están fabricadas con silicona médica hipoalergénica, evitando cualquier tipo de reacción o alergia al contacto prolongado." },
+                { q: "¿Qué pasa si me roban/pierdo una pulsera?", a: "Puedes desactivar el perfil asociado a esa pulsera de inmediato desde nuestra plataforma web para que tus datos queden protegidos." },
+            ];
+
+            return (
+                <section id="faq" className="py-24 bg-white">
+                    <div className="max-w-3xl mx-auto px-6 md:px-12">
+                        <h2 className="text-4xl md:text-5xl font-heading font-bold text-primary mb-12 text-center tracking-tight">FAQ</h2>
+                        <div className="bg-background rounded-2xl p-2 md:p-6 border border-borderSubtle">
+                            {faqs.map((faq, idx) => (
+                                <FAQItem
+                                    key={idx}
+                                    question={faq.q}
+                                    answer={faq.a}
+                                    isOpen={openIdx === idx}
+                                    onClick={() => setOpenIdx(idx === openIdx ? -1 : idx)}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        const BottomCTA = () => {
+            return (
+                <section className="py-24 bg-white relative">
+                    <div className="max-w-6xl mx-auto px-6 md:px-12">
+                        {/* Dark Bento Box */}
+                        <div className="bg-primary rounded-[32px] md:rounded-[48px] overflow-hidden flex flex-col md:flex-row relative shadow-2xl premium-shadow group cursor-pointer transition-transform duration-500 hover:scale-[1.01]">
+                            {/* Left Content */}
+                            <div className="p-10 md:p-16 flex-1 z-10 flex flex-col justify-center">
+                                <h2 className="text-3xl md:text-5xl font-heading font-bold text-white mb-6 tracking-tight text-balance leading-tight">
+                                    Protege lo que <br className="hidden md:block" />más importa hoy
+                                </h2>
+                                <p className="text-slate-300 mb-8 max-w-sm font-medium leading-relaxed">
+                                    La compra incluye la Edición Aura Black, información y sin mensualidad de mantenimiento.
+                                </p>
+
+                                <div className="flex items-center gap-4 mb-8">
+                                    <span className="text-white text-3xl font-bold font-heading">$19.990</span>
+                                    <div className="flex flex-col">
+                                        <span className="text-slate-400 line-through text-xs font-semibold">$35.000</span>
+                                        <span className="bg-green-500/20 text-green-400 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide border border-green-500/30">10% dto. Lanzamiento</span>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <Button href="https://mpago.la/14iTA4z" target="_blank" rel="noopener noreferrer" variant="light" className="w-full sm:w-auto font-bold px-8">Comprar ahora</Button>
+                                </div>
+                            </div>
+
+                            {/* Right Graphic Pattern (QR-like Bento aesthetic) */}
+                            <div className="flex-1 min-h-[300px] relative bg-slate-900 border-l border-white/5 flex items-center justify-center overflow-hidden">
+                                <div className="absolute inset-0 bg-gradient-to-br from-primary via-slate-900 to-black z-0"></div>
+                                {/* Glow element */}
+                                <div className="absolute w-64 h-64 bg-[#CA8A04]/20 rounded-full blur-[80px] group-hover:bg-[#CA8A04]/30 transition-colors duration-700"></div>
+
+                                {/* Abstract AI/QR Tech Pattern */}
+                                <div className="relative z-10 w-48 h-48 grid grid-cols-3 grid-rows-3 gap-2 p-2 transform transition-transform duration-700 group-hover:rotate-6 group-hover:scale-110">
+                                    {/* Corners built manually for bento look */}
+                                    <div className="rounded-xl border border-white/20 bg-white/5 flex justify-center items-center"><div className="w-2 h-2 rounded-full bg-white/40"></div></div>
+                                    <div className="rounded-tl-full rounded-b-xl border border-white/10 bg-white/5"></div>
+                                    <div className="rounded-xl border border-white/20 bg-white/5 flex justify-center items-center"><div className="w-4 h-4 rounded bg-white/20"></div></div>
+
+                                    <div className="rounded-tr-full rounded-bl-full border border-white/10 bg-white/5"></div>
+                                    <div className="rounded-2xl border-2 border-white/80 bg-white/10 flex justify-center items-center backdrop-blur-md shadow-[0_0_15px_rgba(255,255,255,0.3)]">
+                                        <span className="text-white font-heading font-black text-xl">A</span>
+                                    </div>
+                                    <div className="rounded-l-full rounded-r-xl border border-white/20 bg-white/5"></div>
+
+                                    <div className="rounded-xl border border-white/20 bg-white/5 flex items-end justify-start p-2"><div className="w-4 h-2 rounded-full bg-cta/60"></div></div>
+                                    <div className="rounded-full border border-white/10 bg-white/5"></div>
+                                    <div className="rounded-xl border border-white/30 bg-white/10"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        const Footer = () => {
+            return (
+                <footer className="bg-black pt-20 pb-10 text-white">
+                    <div className="max-w-7xl mx-auto px-6 md:px-12 flex flex-col md:flex-row justify-between items-center mb-16 gap-8">
+                        <Logo white />
+
+                        <nav className="flex flex-wrap justify-center gap-x-8 gap-y-4 text-sm font-medium text-slate-300">
+                            <a href="#" className="hover:text-white transition-colors cursor-pointer">Uso</a>
+                            <a href="#" className="hover:text-white transition-colors cursor-pointer">Suscripciones</a>
+                            <a href="#" className="hover:text-white transition-colors cursor-pointer">Certificado</a>
+                            <a href="#" className="hover:text-white transition-colors cursor-pointer">Contrato</a>
+                            <a href="#" className="hover:text-white transition-colors cursor-pointer">Soporte</a>
+                        </nav>
+
+                        <div className="flex gap-4">
+                            {/* Custom simplistic SVG icons for social */}
+                            {['FB', 'IG', 'X', 'IN', 'YT'].map((network, i) => (
+                                <a key={i} href="#" aria-label={network} className="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center text-xs font-bold text-slate-400 hover:text-white hover:border-white hover:bg-white/10 transition-all cursor-pointer">
+                                    {network.slice(0, 1)}
+                                </a>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="max-w-7xl mx-auto px-6 md:px-12 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-medium text-slate-500">
+                        <p>&copy; 2026 Aura Smartcare. Todos los derechos reservados.</p>
+                        <div className="flex gap-6">
+                            <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
+                            <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
+                            <a href="#" className="hover:text-white transition-colors">Cookies Settings</a>
+                        </div>
+                    </div>
+                </footer>
+            );
+        };
+
+        const AuraLanding = () => {
+            return (
+                <div className="bg-background min-h-screen font-body overflow-x-hidden pt-10">
+                    <Navbar />
+                    <main>
+                        <Hero />
+                        <Steps />
+                        <Testimonials />
+                        <FAQ />
+                        <BottomCTA />
+                    </main>
+                    <Footer />
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<AuraLanding />);
+    </script>
+
+
+
+</body>
+
+</html>
