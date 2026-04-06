@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Información de Emergencia</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+</head>
+
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+
+    <div id="app" class="bg-white p-8 rounded-xl shadow-2xl max-w-md w-full">
+        <p class="text-center text-gray-500">Cargando datos...</p>
+    </div>
+
+    <script>
+        // 1. CONFIGURACIÓN (Pega tus llaves aquí)
+        const SUPABASE_URL = 'TU_URL_DE_SUPABASE';
+        const SUPABASE_KEY = 'TU_ANON_KEY_DE_SUPABASE';
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        async function cargarDatos() {
+            const app = document.getElementById('app');
+
+            // 2. Obtener el ID de la URL (?id=ABC123)
+            const params = new URLSearchParams(window.location.search);
+            const idQR = params.get('id');
+
+            if (!idQR) {
+                app.innerHTML = '<h1 class="text-red-500 font-bold">Error: Código no detectado.</h1>';
+                return;
+            }
+
+            // 3. Consultar Supabase
+            const { data, error } = await supabase
+                .from('pulseras')
+                .select('*')
+                .eq('id_unico', idQR)
+                .single();
+
+            if (error || !data) {
+                app.innerHTML = '<h1 class="text-red-500 font-bold">Código no válido o no existe.</h1>';
+                return;
+            }
+
+            // 4. Lógica de Pantalla (Registro vs Ficha)
+            if (data.registrada === false) {
+                // MOSTRAR FORMULARIO
+                app.innerHTML = `
+                    <h2 class="text-2xl font-bold mb-4 text-blue-600">Registrar Pulsera</h2>
+                    <p class="mb-4 text-sm text-gray-600">ID: ${idQR}</p>
+                    <input id="nombre" type="text" placeholder="Nombre del portador" class="w-full border p-2 mb-2 rounded">
+                    <textarea id="alergias" placeholder="Alergias o enfermedades" class="w-full border p-2 mb-2 rounded"></textarea>
+                    <input id="contacto" type="text" placeholder="Teléfono de emergencia" class="w-full border p-2 mb-4 rounded">
+                    <button onclick="registrar('${idQR}')" class="w-full bg-blue-600 text-white p-2 rounded font-bold">Activar Pulsera</button>
+                `;
+            } else {
+                // MOSTRAR FICHA MÉDICA
+                app.innerHTML = `
+                    <div class="border-t-8 border-red-600 pt-4">
+                        <h1 class="text-red-600 text-3xl font-black text-center mb-4">¡EMERGENCIA!</h1>
+                        <p class="text-gray-500 text-xs uppercase font-bold">Nombre del portador:</p>
+                        <p class="text-xl font-bold mb-4">${data.nombre_portador}</p>
+                        
+                        <p class="text-gray-500 text-xs uppercase font-bold">Condiciones Médicas:</p>
+                        <p class="text-lg text-red-700 bg-red-50 p-2 rounded mb-4 font-semibold">${data.alergias}</p>
+                        
+                        <p class="text-gray-500 text-xs uppercase font-bold">Llamar en caso de emergencia:</p>
+                        <a href="tel:${data.contacto_emergencia}" class="block w-full bg-green-500 text-white text-center p-4 rounded-lg text-2xl font-bold">
+                            📞 LLAMAR AHORA
+                        </a>
+                    </div>
+                `;
+            }
+        }
+
+        async function registrar(id) {
+            const nombre = document.getElementById('nombre').value;
+            const alergias = document.getElementById('alergias').value;
+            const contacto = document.getElementById('contacto').value;
+
+            const { error } = await supabase
+                .from('pulseras')
+                .update({
+                    nombre_portador: nombre,
+                    alergias: alergias,
+                    contacto_emergencia: contacto,
+                    registrada: true
+                })
+                .eq('id_unico', id);
+
+            if (error) {
+                alert("Error al registrar: " + error.message);
+            } else {
+                alert("¡Pulsera registrada con éxito!");
+                location.reload(); // Recarga para mostrar la ficha
+            }
+        }
+
+        cargarDatos();
+    </script>
+</body>
+
+</html>
