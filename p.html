@@ -4,99 +4,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Información de Emergencia</title>
+    <title>Perfil de Emergencia - Aura</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
 </head>
 
-<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
-
-    <div id="app" class="bg-white p-8 rounded-xl shadow-2xl max-w-md w-full">
-        <p class="text-center text-gray-500">Cargando datos...</p>
+<body class="bg-slate-50 min-h-screen flex items-center justify-center p-4">
+    <div id="app"
+        class="bg-white p-8 rounded-3xl shadow-xl w-full max-w-lg border border-slate-100 relative overflow-hidden">
+        <div class="flex justify-center items-center h-40">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
     </div>
 
     <script>
-        // 1. CONFIGURACIÓN (Pega tus llaves aquí)
-        const SUPABASE_URL = 'TU_URL_DE_SUPABASE';
-        const SUPABASE_KEY = 'TU_ANON_KEY_DE_SUPABASE';
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const SUPABASE_URL = 'https://ajpiwjjiazfksrgylyct.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFqcGl3amppYXpma3NyZ3lseWN0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1MDk3NzksImV4cCI6MjA5MTA4NTc3OX0.DtU4gBlAfTA8wUk-Da1nvmx-FSW7LpB2yoyqwRs-XjA';
+        const auraClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let currentData = null;
+        let currentId = null;
 
         async function cargarDatos() {
-            const app = document.getElementById('app');
-
-            // 2. Obtener el ID de la URL (?id=ABC123)
             const params = new URLSearchParams(window.location.search);
-            const idQR = params.get('id');
+            currentId = params.get('id');
+            if (!currentId) return;
 
-            if (!idQR) {
-                app.innerHTML = '<h1 class="text-red-500 font-bold">Error: Código no detectado.</h1>';
-                return;
-            }
-
-            // 3. Consultar Supabase
-            const { data, error } = await supabase
-                .from('pulseras')
-                .select('*')
-                .eq('id_unico', idQR)
-                .single();
-
+            const { data, error } = await auraClient.from('pulseras').select('*').eq('id_unico', currentId).single();
             if (error || !data) {
-                app.innerHTML = '<h1 class="text-red-500 font-bold">Código no válido o no existe.</h1>';
+                document.getElementById('app').innerHTML = '<div class="text-center text-red-500 font-bold">Error: ID no encontrado</div>';
                 return;
             }
 
-            // 4. Lógica de Pantalla (Registro vs Ficha)
-            if (data.registrada === false) {
-                // MOSTRAR FORMULARIO
-                app.innerHTML = `
-                    <h2 class="text-2xl font-bold mb-4 text-blue-600">Registrar Pulsera</h2>
-                    <p class="mb-4 text-sm text-gray-600">ID: ${idQR}</p>
-                    <input id="nombre" type="text" placeholder="Nombre del portador" class="w-full border p-2 mb-2 rounded">
-                    <textarea id="alergias" placeholder="Alergias o enfermedades" class="w-full border p-2 mb-2 rounded"></textarea>
-                    <input id="contacto" type="text" placeholder="Teléfono de emergencia" class="w-full border p-2 mb-4 rounded">
-                    <button onclick="registrar('${idQR}')" class="w-full bg-blue-600 text-white p-2 rounded font-bold">Activar Pulsera</button>
-                `;
-            } else {
-                // MOSTRAR FICHA MÉDICA
-                app.innerHTML = `
-                    <div class="border-t-8 border-red-600 pt-4">
-                        <h1 class="text-red-600 text-3xl font-black text-center mb-4">¡EMERGENCIA!</h1>
-                        <p class="text-gray-500 text-xs uppercase font-bold">Nombre del portador:</p>
-                        <p class="text-xl font-bold mb-4">${data.nombre_portador}</p>
-                        
-                        <p class="text-gray-500 text-xs uppercase font-bold">Condiciones Médicas:</p>
-                        <p class="text-lg text-red-700 bg-red-50 p-2 rounded mb-4 font-semibold">${data.alergias}</p>
-                        
-                        <p class="text-gray-500 text-xs uppercase font-bold">Llamar en caso de emergencia:</p>
-                        <a href="tel:${data.contacto_emergencia}" class="block w-full bg-green-500 text-white text-center p-4 rounded-lg text-2xl font-bold">
-                            📞 LLAMAR AHORA
-                        </a>
-                    </div>
-                `;
-            }
+            currentData = data;
+            currentData.registrada ? renderFicha() : renderActivacion();
         }
 
-        async function registrar(id) {
-            const nombre = document.getElementById('nombre').value;
-            const alergias = document.getElementById('alergias').value;
-            const contacto = document.getElementById('contacto').value;
+        function renderActivacion() {
+            document.getElementById('app').innerHTML = `
+                <div class="text-center mb-6">
+                    <h2 class="text-2xl font-black text-slate-800">Activar Aura</h2>
+                    <p class="text-sm text-slate-500">Vincula tu pulsera de emergencia</p>
+                </div>
+                <form onsubmit="registrar(event)" class="space-y-4">
+                    <input id="nombre" required placeholder="Nombre Completo" class="w-full border p-3 rounded-xl outline-none focus:ring-2 focus:ring-blue-500">
+                    <textarea id="alergias" required placeholder="Alergias o Condiciones Médicas" class="w-full border p-3 rounded-xl outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                    <input id="contacto" required placeholder="Teléfono de Emergencia" class="w-full border p-3 rounded-xl outline-none focus:ring-2 focus:ring-blue-500">
+                    <div class="grid grid-cols-2 gap-4">
+                        <input id="pin" required maxlength="4" type="password" placeholder="PIN (4 dígitos)" class="w-full border p-3 rounded-xl text-center font-bold">
+                        <input id="email" required type="email" placeholder="Email de respaldo" class="w-full border p-3 rounded-xl">
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 text-white p-4 rounded-xl font-bold shadow-lg">Activar Ahora</button>
+                </form>
+            `;
+            lucide.createIcons();
+        }
 
-            const { error } = await supabase
-                .from('pulseras')
-                .update({
-                    nombre_portador: nombre,
-                    alergias: alergias,
-                    contacto_emergencia: contacto,
-                    registrada: true
-                })
-                .eq('id_unico', id);
+        function renderFicha() {
+            document.getElementById('app').innerHTML = `
+                <div class="absolute top-0 left-0 w-full h-2 bg-red-600"></div>
+                <div class="flex justify-between items-start mb-6">
+                    <h1 class="text-2xl font-black text-slate-900">Ficha Médica</h1>
+                    <button onclick="solicitarPin()" class="text-slate-400 hover:text-slate-600 p-2 bg-slate-50 rounded-full border">
+                        <i data-lucide="settings" class="w-4 h-4"></i>
+                    </button>
+                </div>
+                <div class="space-y-6">
+                    <div>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Paciente</p>
+                        <p class="text-2xl font-black text-slate-800">${currentData.nombre_portador}</p>
+                    </div>
+                    <div class="bg-red-50 p-5 rounded-2xl border border-red-100">
+                        <p class="text-red-800 text-xs font-bold uppercase mb-2">Alergias y Riesgos</p>
+                        <p class="text-lg font-bold text-red-900 leading-tight">${currentData.alergias}</p>
+                    </div>
+                    <a href="tel:${currentData.contacto_emergencia}" class="flex items-center justify-center gap-3 bg-red-600 text-white p-5 rounded-2xl text-2xl font-black shadow-xl shadow-red-200">
+                        <i data-lucide="phone" class="w-6 h-6 animate-pulse"></i> LLAMAR AHORA
+                    </a>
+                </div>
+            `;
+            lucide.createIcons();
+        }
 
-            if (error) {
-                alert("Error al registrar: " + error.message);
-            } else {
-                alert("¡Pulsera registrada con éxito!");
-                location.reload(); // Recarga para mostrar la ficha
-            }
+        async function registrar(e) {
+            e.preventDefault();
+            const { error } = await auraClient.from('pulseras').update({
+                nombre_portador: document.getElementById('nombre').value,
+                alergias: document.getElementById('alergias').value,
+                contacto_emergencia: document.getElementById('contacto').value,
+                pin: document.getElementById('pin').value,
+                email_respaldo: document.getElementById('email').value,
+                registrada: true
+            }).eq('id_unico', currentId);
+            if (error) alert(error.message); else location.reload();
+        }
+
+        function solicitarPin() {
+            const p = prompt("Ingresa tu PIN para editar:");
+            if (p === currentData.pin) renderEditar(); else if (p !== null) alert("PIN incorrecto");
+        }
+
+        function renderEditar() {
+            document.getElementById('app').innerHTML = `
+                <h2 class="text-xl font-bold mb-4 text-slate-800">Editar Información</h2>
+                <form onsubmit="actualizar(event)" class="space-y-4">
+                    <input id="enombre" value="${currentData.nombre_portador}" class="w-full border p-3 rounded-xl">
+                    <textarea id="ealergias" class="w-full border p-3 rounded-xl">${currentData.alergias}</textarea>
+                    <input id="econtacto" value="${currentData.contacto_emergencia}" class="w-full border p-3 rounded-xl">
+                    <button type="submit" class="w-full bg-slate-800 text-white p-4 rounded-xl font-bold">Guardar Cambios</button>
+                    <button type="button" onclick="renderFicha()" class="w-full text-slate-500 font-medium">Cancelar</button>
+                </form>
+            `;
+        }
+
+        async function actualizar(e) {
+            e.preventDefault();
+            const { error } = await auraClient.from('pulseras').update({
+                nombre_portador: document.getElementById('enombre').value,
+                alergias: document.getElementById('ealergias').value,
+                contacto_emergencia: document.getElementById('econtacto').value
+            }).eq('id_unico', currentId);
+            if (error) alert(error.message); else location.reload();
         }
 
         cargarDatos();
