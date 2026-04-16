@@ -8,44 +8,88 @@
     <meta name="description"
         content="Aura es la pulsera inteligente con código QR único que protege a quienes más quieres.">
 
-    <!-- React & ReactDOM -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-    <!-- Babel for JSX -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Google Fonts: Satoshi and General Sans alternatives (Inter & Plus Jakarta Sans are reliable web fonts with similar vibes) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
         href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap"
         rel="stylesheet">
 
-    <!-- Tailwind Config for Design System -->
     <script>
         tailwind.config = {
             darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
-                        primary: '#0F172A',
-                        secondary: '#1E3A8A',
-                        cta: '#CA8A04',
-                        background: '#FAFAFA',
-                        surface: '#FFFFFF',
-                        textPrimary: '#020617',
-                        textSecondary: '#475569',
-                        textMuted: '#94A3B8',
-                        borderSubtle: '#F1F5F9',
-                        borderMedium: '#E2E8F0',
+                        // NUEVOS TOKENS DE AURA
+                        'brand-primary': '#006FFF',
+                        'brand-secondary': '#C3DDFF',
+                        'text-title': '#1A1A1A',
+                        'text-body': '#4A4A4A',
+                        'surface-main': '#FFFFFF',
+                        'surface-secondary': '#FAFAFA',
+                        'status-success': '#22C55E',
+                        'status-warning': '#F59E0B',
+                        'status-error': '#EF4444',
+                        'status-info': '#3B82F6',
+                        'line': '#C4C4C4',
+                        'cta': '#CA8A04',
                     },
+                    spacing: {
+                        // NUEVOS TOKENS DE ESPACIADO
+                        'container-padding-pc': '64px',
+                        'container-padding-mb': '16px',
+                        'spacing-2xl': '80px',
+                        'spacing-2xl-mb': '40px',
+                        'spacing-xl': '128px',
+                        'spacing-xl-mb': '64px',
+                        'spacing-lg': '48px',
+                        'spacing-lg-mb': '24px',
+                        'spacing-md': '32px',
+                        'spacing-md-mb': '16px',
+                        'spacing-sm': '16px',
+                        'spacing-sm-mb': '12px',
+                        'spacing-xs': '8px',
+                        'spacing-xs-mb': '8px',
+                    },
+                    borderRadius: {
+                        // NUEVOS TOKENS DE BORDES
+                        'radius-xl': '40px',
+                        'radius-xl-mb': '24px',
+                        'radius-lg': '24px',
+                        'radius-lg-mb': '16px',
+                        'radius-md': '12px',
+                        'radius-md-mb': '8px',
+                        'radius-sm': '8px',
+                        'radius-sm-mb': '8px',
+                        'radius-full': '9999px',
+                    },
+                    fontSize: {
+                        'aura-h1': '82px',
+                        'aura-h1-mb': '40px',
+                        'aura-h2': '48px',
+                        'aura-h2-mb': '32px',
+                        'aura-h3': '32px',
+                        'aura-h3-mb': '24px',
+                        'aura-h4': '28px',
+                        'aura-h4-mb': '20px',
+                        'aura-sub': '22px', // Lo acorté a "sub" para que escribas menos
+                        'aura-sub-mb': '16px',
+                        'aura-body': '20px',
+                        'aura-body-mb': '18px',
+                        'aura-small': '14px',
+                    },
+
                     fontFamily: {
                         heading: ['"Plus Jakarta Sans"', 'sans-serif'],
                         body: ['"Inter"', 'sans-serif'],
                     },
                     boxShadow: {
+                        // Tus sombras originales importantes
                         'glass': '0 8px 32px 0 rgba(15, 23, 42, 0.05)',
                         'glass-hover': '0 12px 48px 0 rgba(15, 23, 42, 0.1)',
                         'card': '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
@@ -85,10 +129,8 @@
 
         .premium-shadow {
             box-shadow: 0 4px 24px -4px rgba(15, 23, 42, 0.04), 0 16px 40px -8px rgba(15, 23, 42, 0.08);
-            /* Sophisticated subtle shadow */
         }
 
-        /* Hide scrollbar for clean horizontal scrolls if any */
         .no-scrollbar::-webkit-scrollbar {
             display: none;
         }
@@ -104,13 +146,13 @@
     </style>
 </head>
 
-<body class="antialiased selection:bg-primary selection:text-white">
+<body class="antialiased selection:bg-brand-primary selection:text-white">
     <div id="root"></div>
 
     <script type="text/babel">
         const { useState, useEffect } = React;
 
-        // ------------- ICONS (SVG inline for self-containment) -------------
+        // ------------- ICONS -------------
         const ChevronDown = ({ className = "w-5 h-5" }) => (
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="6 9 12 15 18 9"></polyline></svg>
         );
@@ -136,11 +178,13 @@
         // ------------- COMPONENTS -------------
 
         const Button = ({ children, variant = "primary", className = "", href, ...props }) => {
-            const baseClasses = "inline-flex items-center justify-center font-medium rounded-full transition-all duration-300 ease-out cursor-pointer active:scale-95 px-6 py-3";
+            // Aplicamos aquí el token de borde redondo (rounded-aura-full)
+            const baseClasses = "inline-flex items-center justify-center font-medium rounded-radius-xl transition-all duration-300 ease-out cursor-pointer active:scale-95 px-6 py-3";
             const variants = {
-                primary: "bg-primary text-white hover:bg-slate-800 hover:shadow-lg hover:-translate-y-0.5 shadow-md",
-                secondary: "bg-white text-primary border border-borderMedium hover:bg-slate-50 hover:shadow-md hover:border-slate-300 hover:-translate-y-0.5",
-                light: "bg-white text-primary hover:bg-slate-50 shadow-md hover:shadow-lg hover:-translate-y-0.5",
+                // Aplicamos los colores de Aura (brand-primary y brand-secondary)
+                primary: "bg-brand-primary text-white hover:bg-opacity-90 ",
+                secondary: "text-brand-primary hover:bg-opacity-80 ",
+                light: "bg-white text-brand-primary hover:bg-slate-50  hover:shadow-lg hover:-translate-y-0.5",
                 outline: "bg-transparent text-white border border-white/30 hover:bg-white/10 backdrop-blur-sm",
             };
             if (href) {
@@ -158,12 +202,13 @@
         };
 
         const Logo = ({ white = false }) => (
-            <div className={`flex items-center gap-1 font-heading font-bold text-2xl tracking-tighter ${white ? 'text-white' : 'text-primary'}`}>
-                <div className={`w-6 h-6 rounded-md flex items-center justify-center ${white ? 'bg-white text-primary' : 'bg-primary text-white'}`}>
-                    <span className="text-sm">A</span>
-                </div>
-                URA
-            </div>
+            <a href="#" className="flex items-center transition-transform hover:scale-105 active:scale-95">
+                <img
+                    src="./assets/logo-brand.png"
+                    alt="Aura Smartcare"
+                    className={`h-8 md:h-10 w-auto object-contain ${white ? 'brightness-0 invert' : ''}`}
+                />
+            </a>
         );
 
         const Navbar = () => {
@@ -176,15 +221,16 @@
             }, []);
 
             return (
-                <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'py-3 bg-white/80 backdrop-blur-lg border-b border-borderSubtle shadow-sm' : 'py-5 bg-transparent'}`}>
-                    <div className="max-w-7xl mx-auto px-6 md:px-12 flex items-center justify-between">
+                <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'py-3 bg-white/80 backdrop-blur-lg border-b border-line shadow-sm' : 'py-5 bg-white'}`}>
+                    {/* Aplicamos token de padding de Aura (responsive) */}
+                    <div className="mx-auto px-container-padding-mb md:px-container-padding-pc flex items-center justify-between">
                         <Logo />
-                        <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-textSecondary">
-                            <a href="#como-funciona" className="hover:text-primary transition-colors cursor-pointer">Cómo funciona</a>
-                            <a href="#opiniones" className="hover:text-primary transition-colors cursor-pointer">Opiniones</a>
-                            <a href="#faq" className="hover:text-primary transition-colors cursor-pointer">FAQ</a>
+                        <nav className="hidden md:flex items-center gap-spacing-md-mb md:gap-spacing-md text-aura-body-mb md:text-aura-body">
+                            <a href="#como-funciona" className="hover:text-brand-primary transition-colors cursor-pointer">Cómo funciona</a>
+                            <a href="#opiniones" className="hover:text-brand-primary transition-colors cursor-pointer">Opiniones</a>
+                            <a href="#faq" className="hover:text-brand-primary transition-colors cursor-pointer">FAQ</a>
                         </nav>
-                        <Button href="https://mpago.la/14iTA4z" target="_blank" rel="noopener noreferrer" variant="primary" className="py-2.5 px-5 text-sm">Comprar ahora</Button>
+                        <Button href="https://mpago.la/14iTA4z" target="_blank" rel="noopener noreferrer" variant="primary" className="text-aura-body-mb md:text-aura-body px-8">Comprar ahora</Button>
                     </div>
                 </header>
             );
@@ -192,55 +238,43 @@
 
         const Hero = () => {
             return (
-                <section className="relative pt-32 pb-20 md:pt-40 md:pb-32 overflow-hidden">
+                <section className="relative pt-32 pb-20 md:pt-40 md:pb-32 overflow-hidden bg-surface-secondary">
                     {/* Subtle Background Elements */}
-                    <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[50%] bg-blue-100/50 rounded-full blur-[100px] pointer-events-none"></div>
+
                     <div className="absolute top-[20%] right-[-10%] w-[30%] h-[40%] bg-yellow-50/50 rounded-full blur-[80px] pointer-events-none"></div>
 
-                    <div className="max-w-7xl mx-auto px-6 md:px-12 grid lg:grid-cols-2 gap-12 lg:gap-8 items-center">
+                    {/* Aplicamos token de padding lateral: aura-padding-mb en móvil y aura-padding-pc en desktop */}
+                    <div className="px-container-padding-mb md:px-container-padding-pc grid lg:grid-cols-2 gap-spacing-lg-mb md:gap-spacing-lg lg:gap-spacing-md-mb md:gap-spacing-md items-center">
                         <div className="flex flex-col items-start z-10">
-                            <h1 className="text-5xl md:text-6xl lg:text-[72px] font-heading font-extrabold leading-[1.1] tracking-tight text-primary mb-2">
+                            {/* Título usando text-title y acento con brand-primary */}
+                            <h1 className="text-[40px] md:text-[82px] font-heading font-extrabold leading-[1.1] tracking-tight text-text-title mb-2">
                                 TU SEGURIDAD <br />
-                                <span className="text-textSecondary font-semibold">siempre contigo</span>
+                                <span className="text-brand-primary font-semibold">siempre contigo</span>
                             </h1>
-                            <p className="mt-6 text-lg text-textSecondary max-w-lg leading-relaxed text-balance">
+                            {/* Párrafo con token text-body */}
+                            <p className="mt-spacing-md mb-spacing-md text-aura-body-mb md:text-aura-body leading-relaxed text-text-body">
                                 Aura es la pulsera inteligente con código QR único que protege a quienes más quieres. Información médica vital a un escaneo de distancia.
                             </p>
 
-                            <div className="mt-10 flex flex-wrap gap-4">
-                                <Button href="https://mpago.la/14iTA4z" target="_blank" rel="noopener noreferrer" variant="primary" className="text-base px-8">Comprar ahora</Button>
-                                <Button variant="secondary" className="text-base px-8">Activar mi pulsera</Button>
+                            <div className="mt-spacing-md mb-spacing-md flex flex-wrap gap-4">
+                                <Button href="https://mpago.la/14iTA4z" target="_blank" rel="noopener noreferrer" variant="primary" className="text-aura-body-mb md:text-aura-body px-8">Comprar ahora</Button>
+                                <Button variant="secondary" className="text-aura-body-mb md:text-aura-body px-8">Activar mi pulsera</Button>
                             </div>
                         </div>
 
                         {/* Product Image Showcase */}
                         <div className="relative w-full aspect-square md:aspect-[4/3] max-w-md mx-auto lg:max-w-none lg:mx-0 z-10 group perspective">
-                            {/* Glowing backdrop matching the wristband color (orange/blue) */}
-                            <div className="absolute inset-4 bg-gradient-to-tr from-[#E17C5B]/40 to-[#1F2937]/30 rounded-[32px] blur-2xl group-hover:blur-3xl transition-all duration-700 opacity-60"></div>
-
-                            <div className="relative w-full h-full bg-gradient-to-b from-[#F3F4F6] to-[#E5E7EB] rounded-[32px] overflow-hidden premium-shadow transform group-hover:-translate-y-2 group-hover:rotate-1 transition-all duration-500 ease-out flex items-center justify-center border border-white/80">
-                                {/* Abstract Bracelet Representation / Placeholder since no image assets provided */}
-                                <div className="relative w-64 h-64">
-                                    <div className="absolute inset-0 border-[28px] border-[#1E3A8A] rounded-full transform -rotate-12 group-hover:rotate-0 transition-transform duration-700 shadow-xl clip-band"></div>
-                                    <div className="absolute inset-0 border-[28px] border-[#E88C6F] rounded-full transform -rotate-12 group-hover:rotate-0 transition-transform duration-700 shadow-inner clip-band-top z-10 flex items-center justify-center">
-                                        {/* QR Scan box representation */}
-                                        <div className="absolute top-[20%] right-[10%] w-12 h-16 bg-white rounded flex items-center justify-center shadow-md border border-gray-100 transform rotate-45">
-                                            <div className="w-8 h-8 border-2 border-dashed border-gray-800 rounded-sm"></div>
-                                        </div>
-                                    </div>
-                                    {/* Light reflections */}
-                                    <div className="absolute top-4 left-8 w-24 h-4 bg-white/20 rounded-full blur-sm transform -rotate-45 z-20"></div>
-                                </div>
+                            <div className="absolute inset-4 bg-gradient-to-tr from-brand-secondary to-[#1F2937]/30 rounded-[32px] blur-2xl group-hover:blur-3xl transition-all duration-700 opacity-60"></div>
+                            <div className="relative w-full h-full rounded-[32px] overflow-hidden  transform group-hover:-translate-y-2 group-hover:rotate-1 transition-all duration-500 ease-out">
+                                <img src="./assets/header-img.png" alt="Aura Smart Bracelet" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" />
                             </div>
-
-                            {/* Floating Compatibility Badge */}
                             <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 glass-panel rounded-full px-5 py-3 shadow-lg flex items-center gap-3 w-max transition-transform hover:-translate-y-1 cursor-default">
-                                <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center">
+                                <div className="w-8 h-8 rounded-full bg-blue-50 text-brand-primary flex items-center justify-center">
                                     <Smartphone className="w-4 h-4" />
                                 </div>
-                                <div className="text-sm text-primary">
+                                <div className="text-sm text-text-title">
                                     <p className="font-semibold leading-tight">Escaneo instantáneo</p>
-                                    <p className="text-xs text-textSecondary">Compatible con iPhone y Android</p>
+                                    <p className="text-xs text-text-body">Compatible con iPhone y Android</p>
                                 </div>
                             </div>
                         </div>
@@ -254,41 +288,37 @@
                 {
                     title: "Activa y Configura",
                     desc: "Vincula la pulsera a nuestra web app con datos médicos, alergias y contactos de emergencia.",
-                    color: "bg-blue-50",
+                    image: "./assets/como-funciona-01.png",
                     delay: "0ms"
                 },
                 {
                     title: "Entrega la pulsera",
                     desc: "Ajusta la pulsera a la medida de su muñeca o de tu ser querido. Se activará en caso de emergencia.",
-                    color: "bg-orange-50",
+                    image: "./assets/como-funciona-02.png",
                     delay: "150ms"
                 },
                 {
                     title: "Escaneo de auxilio",
                     desc: "Si ocurre un incidente, cualquier persona puede escanear el QR y avisar a los familiares o contactarte.",
-                    color: "bg-slate-100",
+                    image: "./assets/como-funciona-03.png",
                     delay: "300ms"
                 }
             ];
 
             return (
-                <section id="como-funciona" className="py-24 bg-white relative">
-                    <div className="max-w-7xl mx-auto px-6 md:px-12 text-center">
-                        <h2 className="text-3xl md:text-4xl font-heading font-bold text-primary mb-4 tracking-tight">Tres pasos para tu tranquilidad</h2>
-                        <p className="text-textSecondary text-lg max-w-2xl mx-auto mb-16 text-balance">Desde que abres la caja hasta que tu ser querido está protegido.</p>
+                <section id="como-funciona" className="py-spacing-lg-mb md:py-spacing-lg bg-surface-main relative">
+                    <div className="px-container-padding-mb md:px-container-padding-pc text-center">
+                        <h2 className="text-aura-h2-mb md:text-aura-h2 font-bold mb-4 tracking-tight">Tres pasos para tu tranquilidad</h2>
+                        <p className="text-aura-sub-mb md:text-aura-sub text-text-body mx-auto mb-16 text-balance">Desde que abres la caja hasta que tu ser querido está protegido.</p>
 
                         <div className="grid md:grid-cols-3 gap-8">
                             {steps.map((step, idx) => (
-                                <div key={idx} className="group flex flex-col items-start text-left bg-background rounded-2xl p-6 transition-all duration-300 hover:shadow-card-hover hover:-translate-y-1 border border-transparent hover:border-gray-100 cursor-pointer">
-                                    <div className={`w-full aspect-[4/3] rounded-xl mb-6 flex items-center justify-center overflow-hidden relative ${step.color}`}>
-                                        <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent mix-blend-overlay"></div>
-                                        {/* Mock UI for images inside grey boxes */}
-                                        <div className="w-20 h-20 rounded-2xl bg-white shadow-sm flex items-center justify-center text-2xl font-bold text-slate-300 group-hover:scale-110 transition-transform duration-500 ease-spring">
-                                            {idx + 1}
-                                        </div>
+                                <div key={idx} className="group flex flex-col items-start text-left bg-surface-secondary rounded-radius-lg-mb md:rounded-radius-lg p-6 transition-all duration-300 hover:shadow-card-hover hover:-translate-y-1 border border-transparent hover: cursor-pointer">
+                                    <div className="w-full rounded-radius-sm md:rounded-radius-sm mb-6 flex items-center justify-center overflow-hidden bg-slate-100">
+                                        <img src={step.image} alt={step.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out" />
                                     </div>
-                                    <h3 className="text-xl font-bold text-primary mb-3 font-heading group-hover:text-cta transition-colors">{step.title}</h3>
-                                    <p className="text-textSecondary leading-relaxed">{step.desc}</p>
+                                    <h3 className="text-aura-h3-mb md:text-aura-h3 font-bold  mb-2 group-hover:text-brand-primary transition-colors">{step.title}</h3>
+                                    <p className="text-aura-body-mb md:text-aura-body text-text-body leading-relaxed">{step.desc}</p>
                                 </div>
                             ))}
                         </div>
@@ -299,41 +329,39 @@
 
         const Testimonials = () => {
             return (
-                <section id="opiniones" className="py-24 bg-background">
-                    <div className="max-w-7xl mx-auto px-6 md:px-12 grid lg:grid-cols-2 gap-16 items-center">
+                <section id="opiniones" className="py-spacing-lg-mb md:py-spacing-lg px-container-padding-mb md:px-container-padding-pc">
+                    <div className="bg-surface-secondary rounded-radius-lg px-container-padding-mb md:px-container-padding-pc py-spacing-lg grid lg:grid-cols-2 gap-16 items-center">
                         <div className="max-w-md">
-                            <h2 className="text-3xl md:text-5xl font-heading font-bold text-primary mb-6 tracking-tight leading-tight">Que dicen nuestros<br />usuarios</h2>
-                            <p className="text-textSecondary text-lg leading-relaxed text-balance mb-8">
+                            <h2 className="text-aura-h2-mb md:text-aura-h2 font-heading font-bold mb-6 tracking-tight leading-tight">Que dicen nuestros<br />usuarios</h2>
+                            <p className="text-aura-body-mb md:text-aura-body leading-relaxed text-balance mb-8">
                                 Creado por pacientes, escuchamos y leemos a todos quienes se sienten más protegidos y tranquilos.
                             </p>
 
-                            {/* Custom Navigation */}
                             <div className="flex items-center gap-6">
                                 <div className="flex gap-2">
-                                    <div className="w-2 h-2 rounded-full bg-primary cursor-pointer transition-transform hover:scale-150"></div>
-                                    <div className="w-2 h-2 rounded-full bg-slate-300 cursor-pointer transition-transform hover:bg-slate-400"></div>
-                                    <div className="w-2 h-2 rounded-full bg-slate-300 cursor-pointer transition-transform hover:bg-slate-400"></div>
-                                    <div className="w-2 h-2 rounded-full bg-slate-300 cursor-pointer transition-transform hover:bg-slate-400"></div>
+                                    <div className="w-2 h-2 rounded-radius-sm-mb md:rounded-radius-sm bg-brand-primary cursor-pointer transition-transform hover:scale-150"></div>
+                                    <div className="w-2 h-2 rounded-radius-sm-mb md:rounded-radius-sm bg-slate-300 cursor-pointer transition-transform hover:bg-slate-400"></div>
+                                    <div className="w-2 h-2 rounded-radius-sm-mb md:rounded-radius-sm bg-slate-300 cursor-pointer transition-transform hover:bg-slate-400"></div>
+                                    <div className="w-2 h-2 rounded-radius-sm-mb md:rounded-radius-sm bg-slate-300 cursor-pointer transition-transform hover:bg-slate-400"></div>
                                 </div>
                                 <div className="flex gap-4 ml-auto">
-                                    <button className="w-10 h-10 rounded-full border border-borderMedium flex items-center justify-center text-primary hover:bg-white hover:shadow-sm transition-all hover:scale-105 active:scale-95 cursor-pointer">
+                                    <button className="w-10 h-10 rounded-full border border-line flex items-center justify-center text-text-title hover:bg-white hover:shadow-sm transition-all hover:scale-105 active:scale-95 cursor-pointer">
                                         <ArrowLeft />
                                     </button>
-                                    <button className="w-10 h-10 rounded-full border border-borderMedium flex items-center justify-center text-primary hover:bg-white hover:shadow-sm transition-all hover:scale-105 active:scale-95 cursor-pointer">
+                                    <button className="w-10 h-10 rounded-full border border-line flex items-center justify-center text-text-title hover:bg-white hover:shadow-sm transition-all hover:scale-105 active:scale-95 cursor-pointer">
                                         <ArrowRight />
                                     </button>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Testimonial Bento Card */}
                         <div className="relative z-10 group cursor-pointer">
-                            <div className="absolute inset-0 bg-gradient-to-r from-yellow-200/20 to-orange-200/20 rounded-[32px] blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                            <div className="bg-white rounded-[24px] p-10 premium-shadow border border-gray-100 transform transition-all duration-300 group-hover:-translate-y-1 leading-relaxed">
+                            <div className="absolute inset-0 bg-gradient-to-r from-brand-secondary/40 to-blue-200/20 rounded-radius-md-mb md:rounded-radius-md blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                            <div className="bg-white rounded-radius-md-mb md:rounded-radius-md p-10 transform transition-all duration-300 group-hover:-translate-y-1 leading-relaxed">
                                 <div className="flex gap-1 mb-6">
                                     {[1, 2, 3, 4, 5].map(i => <Star key={i} />)}
                                 </div>
-                                <p className="text-xl md:text-2xl text-primary font-medium mb-10 text-balance">
+                                <p className="text-xl md:text-2xl text-text-title font-medium mb-10 text-balance">
                                     "Con Aura me siento tranquilo cuando mi padre sale a caminar. Sé que tiene demencia y alguna vez se nos ha perdido."
                                 </p>
                                 <div className="flex items-center gap-4">
@@ -341,8 +369,8 @@
                                         <img src="https://i.pravatar.cc/150?img=47" alt="Avatar de Clara R." className="w-full h-full object-cover" />
                                     </div>
                                     <div>
-                                        <p className="font-bold text-primary font-heading">Clara R.</p>
-                                        <p className="text-sm text-textSecondary font-medium">Mamá</p>
+                                        <p className="font-bold text-text-title font-heading">Clara R.</p>
+                                        <p className="text-sm text-text-body font-medium">Mamá</p>
                                     </div>
                                 </div>
                             </div>
@@ -353,21 +381,21 @@
         };
 
         const FAQItem = ({ question, answer, isOpen, onClick }) => (
-            <div className={`border-b border-borderMedium last:border-0 transition-colors duration-300 ${isOpen ? 'bg-white rounded-xl shadow-sm border-transparent my-2 px-6 pb-2' : ''}`}>
+            <div className={`rounded-radius-sm-mb md:rounded-radius-sm transition-colors duration-300 ${isOpen ? 'bg-white px-6 pb-2' : 'rounded-radius-sm-mb md:rounded-radius-sm'}`}>
                 <button
-                    className={`w-full py-6 flex items-center justify-between text-left focus:outline-none transition-colors group cursor-pointer ${!isOpen && 'hover:text-cta px-6'}`}
+                    className={`w-full py-6 flex items-center justify-between text-left focus:outline-none transition-colors group cursor-pointer ${!isOpen && 'hover:text-brand-primary px-6'}`}
                     onClick={onClick}
                 >
-                    <span className="font-semibold text-primary group-hover:text-cta transition-colors text-lg pr-8">{question}</span>
-                    <span className={`text-cta flex-shrink-0 transition-transform duration-300 ease-spring ${isOpen ? 'rotate-180 bg-orange-50 rounded-full p-1' : ''}`}>
+                    <span className="font-semibold text-aura-body-mb md:text-aura-body group-hover:text-brand-primary transition-colors pr-8">{question}</span>
+                    <span className={`text-brand-primary flex-shrink-0 transition-transform duration-300 ease-spring ${isOpen ? 'rotate-180 bg-brand-secondary rounded-full p-1' : ''}`}>
                         {isOpen ? <Minus /> : <Plus />}
                     </span>
                 </button>
                 <div
                     className={`overflow-hidden transition-all duration-300 ease-in-out px-6`}
-                    style={{ maxHeight: isOpen ? '200px' : '0', opacity: isOpen ? 1 : 0 }}
+                    style={{ maxHeight: isOpen ? '500px' : '0', opacity: isOpen ? 1 : 0 }}
                 >
-                    <p className="text-textSecondary pb-6 leading-relaxed">
+                    <p className="text-text-body pb-6">
                         {answer}
                     </p>
                 </div>
@@ -385,10 +413,10 @@
             ];
 
             return (
-                <section id="faq" className="py-24 bg-white">
-                    <div className="max-w-3xl mx-auto px-6 md:px-12">
-                        <h2 className="text-4xl md:text-5xl font-heading font-bold text-primary mb-12 text-center tracking-tight">FAQ</h2>
-                        <div className="bg-background rounded-2xl p-2 md:p-6 border border-borderSubtle">
+                <section id="faq" className="py-spacing-lg-mb md:py-spacing-lg bg-surface-main">
+                    <div className="max-w-7xl mx-auto px-container-padding-mb md:px-container-padding-pc">
+                        <h2 className="text-aura-h2-mb md:text-aura-h2 font-heading font-bold text-text-title mb-12 text-center tracking-tight">FAQ</h2>
+                        <div className="bg-surface-secondary rounded-radius-lg-mb md:rounded-radius-lg p-spacing-md-mb md:p-spacing-md">
                             {faqs.map((faq, idx) => (
                                 <FAQItem
                                     key={idx}
@@ -406,24 +434,22 @@
 
         const BottomCTA = () => {
             return (
-                <section className="py-24 bg-white relative">
-                    <div className="max-w-6xl mx-auto px-6 md:px-12">
-                        {/* Dark Bento Box */}
-                        <div className="bg-primary rounded-[32px] md:rounded-[48px] overflow-hidden flex flex-col md:flex-row relative shadow-2xl premium-shadow group cursor-pointer transition-transform duration-500 hover:scale-[1.01]">
-                            {/* Left Content */}
+                <section className="py-spacing-lg-mb md:py-spacing-lg bg-surface-main relative">
+                    <div className="max-w-7xl mx-auto px-container-padding-mb md:px-container-padding-pc">
+                        <div className="bg-brand-primary rounded-radius-lg-mb md:rounded-radius-lg overflow-hidden flex flex-col md:flex-row relative shadow-2xl premium-shadow group cursor-pointer transition-transform duration-500 hover:scale-[1.01]">
                             <div className="p-10 md:p-16 flex-1 z-10 flex flex-col justify-center">
                                 <h2 className="text-3xl md:text-5xl font-heading font-bold text-white mb-6 tracking-tight text-balance leading-tight">
                                     Protege lo que <br className="hidden md:block" />más importa hoy
                                 </h2>
-                                <p className="text-slate-300 mb-8 max-w-sm font-medium leading-relaxed">
+                                <p className="text-blue-100 mb-8 max-w-sm font-medium leading-relaxed">
                                     La compra incluye la Edición Aura Black, información y sin mensualidad de mantenimiento.
                                 </p>
 
                                 <div className="flex items-center gap-4 mb-8">
                                     <span className="text-white text-3xl font-bold font-heading">$19.990</span>
                                     <div className="flex flex-col">
-                                        <span className="text-slate-400 line-through text-xs font-semibold">$35.000</span>
-                                        <span className="bg-green-500/20 text-green-400 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide border border-green-500/30">10% dto. Lanzamiento</span>
+                                        <span className="text-blue-200 line-through text-xs font-semibold">$35.000</span>
+                                        <span className="bg-green-500/20 text-green-300 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide border border-green-500/30">10% dto. Lanzamiento</span>
                                     </div>
                                 </div>
 
@@ -432,28 +458,12 @@
                                 </div>
                             </div>
 
-                            {/* Right Graphic Pattern (QR-like Bento aesthetic) */}
                             <div className="flex-1 min-h-[300px] relative bg-slate-900 border-l border-white/5 flex items-center justify-center overflow-hidden">
-                                <div className="absolute inset-0 bg-gradient-to-br from-primary via-slate-900 to-black z-0"></div>
-                                {/* Glow element */}
-                                <div className="absolute w-64 h-64 bg-[#CA8A04]/20 rounded-full blur-[80px] group-hover:bg-[#CA8A04]/30 transition-colors duration-700"></div>
+                                <div className="absolute inset-0  from-brand-primary via-slate-900 to-black z-0"></div>
+                                <div className="absolute w-64 h-64 bg-brand-primary/20 rounded-full blur-[80px] group-hover:bg-brand-primary/30 transition-colors duration-700"></div>
 
-                                {/* Abstract AI/QR Tech Pattern */}
-                                <div className="relative z-10 w-48 h-48 grid grid-cols-3 grid-rows-3 gap-2 p-2 transform transition-transform duration-700 group-hover:rotate-6 group-hover:scale-110">
-                                    {/* Corners built manually for bento look */}
-                                    <div className="rounded-xl border border-white/20 bg-white/5 flex justify-center items-center"><div className="w-2 h-2 rounded-full bg-white/40"></div></div>
-                                    <div className="rounded-tl-full rounded-b-xl border border-white/10 bg-white/5"></div>
-                                    <div className="rounded-xl border border-white/20 bg-white/5 flex justify-center items-center"><div className="w-4 h-4 rounded bg-white/20"></div></div>
-
-                                    <div className="rounded-tr-full rounded-bl-full border border-white/10 bg-white/5"></div>
-                                    <div className="rounded-2xl border-2 border-white/80 bg-white/10 flex justify-center items-center backdrop-blur-md shadow-[0_0_15px_rgba(255,255,255,0.3)]">
-                                        <span className="text-white font-heading font-black text-xl">A</span>
-                                    </div>
-                                    <div className="rounded-l-full rounded-r-xl border border-white/20 bg-white/5"></div>
-
-                                    <div className="rounded-xl border border-white/20 bg-white/5 flex items-end justify-start p-2"><div className="w-4 h-2 rounded-full bg-cta/60"></div></div>
-                                    <div className="rounded-full border border-white/10 bg-white/5"></div>
-                                    <div className="rounded-xl border border-white/30 bg-white/10"></div>
+                                <div className="relative z-10 w-full max-w-[480px] lg:max-w-[550px] scale-110 transform transition-transform duration-700 group-hover:rotate-6 group-hover:scale-125">
+                                    <img src="./assets/Pulsera_01.png" alt="Aura Pulsera Edición Black" className="w-full h-auto object-contain drop-shadow-2xl" />
                                 </div>
                             </div>
                         </div>
@@ -465,9 +475,8 @@
         const Footer = () => {
             return (
                 <footer className="bg-black pt-20 pb-10 text-white">
-                    <div className="max-w-7xl mx-auto px-6 md:px-12 flex flex-col md:flex-row justify-between items-center mb-16 gap-8">
+                    <div className="max-w-7xl mx-auto px-container-padding-mb md:px-container-padding-pc flex flex-col md:flex-row justify-between items-center mb-16 gap-8">
                         <Logo white />
-
                         <nav className="flex flex-wrap justify-center gap-x-8 gap-y-4 text-sm font-medium text-slate-300">
                             <a href="#" className="hover:text-white transition-colors cursor-pointer">Uso</a>
                             <a href="#" className="hover:text-white transition-colors cursor-pointer">Suscripciones</a>
@@ -475,9 +484,7 @@
                             <a href="#" className="hover:text-white transition-colors cursor-pointer">Contrato</a>
                             <a href="#" className="hover:text-white transition-colors cursor-pointer">Soporte</a>
                         </nav>
-
                         <div className="flex gap-4">
-                            {/* Custom simplistic SVG icons for social */}
                             {['FB', 'IG', 'X', 'IN', 'YT'].map((network, i) => (
                                 <a key={i} href="#" aria-label={network} className="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center text-xs font-bold text-slate-400 hover:text-white hover:border-white hover:bg-white/10 transition-all cursor-pointer">
                                     {network.slice(0, 1)}
@@ -485,8 +492,7 @@
                             ))}
                         </div>
                     </div>
-
-                    <div className="max-w-7xl mx-auto px-6 md:px-12 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-medium text-slate-500">
+                    <div className="max-w-7xl mx-auto px-container-padding-mb md:px-container-padding-pc pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-medium text-slate-500">
                         <p>&copy; 2026 Aura Smartcare. Todos los derechos reservados.</p>
                         <div className="flex gap-6">
                             <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
@@ -500,7 +506,7 @@
 
         const AuraLanding = () => {
             return (
-                <div className="bg-background min-h-screen font-body overflow-x-hidden pt-10">
+                <div className="bg-surface-main min-h-screen font-body overflow-x-hidden pt-10">
                     <Navbar />
                     <main>
                         <Hero />
@@ -517,9 +523,6 @@
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<AuraLanding />);
     </script>
-
-
-
 </body>
 
 </html>
