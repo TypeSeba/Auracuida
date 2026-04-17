@@ -21,7 +21,6 @@
 
     <script>
         tailwind.config = {
-            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
@@ -43,8 +42,6 @@
                         'container-padding-mb': '16px',
                         'spacing-2xl': '80px',
                         'spacing-2xl-mb': '40px',
-                        'spacing-xl': '128px',
-                        'spacing-xl-mb': '64px',
                         'spacing-lg': '48px',
                         'spacing-lg-mb': '24px',
                         'spacing-md': '32px',
@@ -65,7 +62,6 @@
                         'radius-full': '9999px',
                     },
                     fontSize: {
-                        'aura-h1': '82px', 'aura-h1-mb': '40px',
                         'aura-h2': '48px', 'aura-h2-mb': '32px',
                         'aura-h3': '32px', 'aura-h3-mb': '24px',
                         'aura-h4': '28px', 'aura-h4-mb': '20px',
@@ -78,10 +74,9 @@
                         body: ['"Inter"', 'sans-serif'],
                     },
                     boxShadow: {
-                        'card': '0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03)',
-                        'card-hover': '0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04)',
+                        'card': '0 4px 6px -1px rgba(0,0,0,0.05)',
+                        'card-hover': '0 20px 25px -5px rgba(0,0,0,0.1)',
                     },
-                    transitionTimingFunction: { 'spring': 'cubic-bezier(0.175, 0.885, 0.32, 1.275)' }
                 }
             }
         }
@@ -145,56 +140,58 @@
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect } = React;
+        const { useState, useEffect, useRef } = React;
 
-        // ── SUPABASE — tus credenciales originales ──
         const SUPABASE_URL = 'https://ajpiwjjiazfksrgylyct.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFqcGl3amppYXpma3NyZ3lseWN0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1MDk3NzksImV4cCI6MjA5MTA4NTc3OX0.DtU4gBlAfTA8wUk-Da1nvmx-FSW7LpB2yoyqwRs-XjA';
         const auraClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         // ── ICONS ──
-        const Phone = ({ className = "w-5 h-5" }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" /></svg>;
-        const AlertCircle = ({ className = "w-5 h-5" }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>;
-        const ShieldAlert = ({ className = "w-5 h-5" }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>;
-        const Info = ({ className = "w-5 h-5" }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12" y2="12" /><line x1="12" y1="8" x2="12.01" y2="8" /></svg>;
-        const MapPin = ({ className = "w-5 h-5" }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg>;
-        const Share = ({ className = "w-5 h-5" }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" /><line x1="8.59" y1="13.51" x2="15.42" y2="17.49" /><line x1="15.41" y1="6.51" x2="8.59" y2="10.49" /></svg>;
-        const Settings = ({ className = "w-5 h-5" }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" /></svg>;
-        const CheckCircle = ({ className = "w-5 h-5" }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>;
-        const Loader = ({ className = "w-5 h-5" }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`${className} animate-spin`}><line x1="12" y1="2" x2="12" y2="6" /><line x1="12" y1="18" x2="12" y2="22" /><line x1="4.93" y1="4.93" x2="7.76" y2="7.76" /><line x1="16.24" y1="16.24" x2="19.07" y2="19.07" /><line x1="2" y1="12" x2="6" y2="12" /><line x1="18" y1="12" x2="22" y2="12" /><line x1="4.93" y1="19.07" x2="7.76" y2="16.24" /><line x1="16.24" y1="7.76" x2="19.07" y2="4.93" /></svg>;
-        const ArrowLeft = ({ className = "w-5 h-5" }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="19" y1="12" x2="5" y2="12" /><polyline points="12 19 5 12 12 5" /></svg>;
+        const Phone = ({ c = "w-5 h-5" }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={c}><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" /></svg>;
+        const AlertCircle = ({ c = "w-5 h-5" }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={c}><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>;
+        const ShieldAlert = ({ c = "w-5 h-5" }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={c}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>;
+        const Info = ({ c = "w-5 h-5" }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={c}><circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12" y2="12" /><line x1="12" y1="8" x2="12.01" y2="8" /></svg>;
+        const MapPin = ({ c = "w-5 h-5" }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={c}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg>;
+        const Settings = ({ c = "w-5 h-5" }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={c}><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" /></svg>;
+        const CheckCircle = ({ c = "w-5 h-5" }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={c}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>;
+        const Loader = ({ c = "w-5 h-5" }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`${c} animate-spin`}><line x1="12" y1="2" x2="12" y2="6" /><line x1="12" y1="18" x2="12" y2="22" /><line x1="4.93" y1="4.93" x2="7.76" y2="7.76" /><line x1="16.24" y1="16.24" x2="19.07" y2="19.07" /><line x1="2" y1="12" x2="6" y2="12" /><line x1="18" y1="12" x2="22" y2="12" /><line x1="4.93" y1="19.07" x2="7.76" y2="16.24" /><line x1="16.24" y1="7.76" x2="19.07" y2="4.93" /></svg>;
+        const ArrowLeft = ({ c = "w-5 h-5" }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={c}><line x1="19" y1="12" x2="5" y2="12" /><polyline points="12 19 5 12 12 5" /></svg>;
+        const Camera = ({ c = "w-5 h-5" }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={c}><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" /><circle cx="12" cy="13" r="4" /></svg>;
+        const BloodDrop = ({ c = "w-5 h-5" }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={c}><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" /></svg>;
+        const Activity = ({ c = "w-5 h-5" }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={c}><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" /></svg>;
 
         // ── BUTTON ──
-        const Button = ({ children, variant = "primary", className = "", disabled = false, ...props }) => {
-            const base = "inline-flex items-center justify-center font-bold rounded-radius-full transition-all duration-300 ease-out cursor-pointer active:scale-95 px-spacing-sm py-spacing-xs gap-spacing-xs disabled:opacity-60 disabled:cursor-not-allowed";
-            const variants = {
+        const Btn = ({ children, variant = "primary", className = "", disabled = false, ...props }) => {
+            const base = "inline-flex items-center justify-center font-bold rounded-radius-full transition-all duration-300 cursor-pointer active:scale-95 px-spacing-sm py-spacing-xs gap-spacing-xs disabled:opacity-60 disabled:cursor-not-allowed";
+            const v = {
                 primary: "bg-brand-primary text-white hover:bg-opacity-90 hover:shadow-lg hover:-translate-y-0.5 shadow-md",
                 secondary: "bg-surface-main text-text-title border border-line hover:bg-surface-secondary hover:shadow-md hover:-translate-y-0.5",
                 danger: "bg-status-error text-white hover:bg-red-700 hover:shadow-lg hover:-translate-y-0.5 shadow-md",
                 success: "bg-status-success text-white hover:bg-green-600 hover:shadow-lg hover:-translate-y-0.5 shadow-md",
                 ghost: "bg-transparent text-text-body hover:bg-surface-secondary",
+                dark: "bg-text-title text-white hover:bg-opacity-80 hover:shadow-lg hover:-translate-y-0.5 shadow-md",
             };
-            return <button disabled={disabled} className={`${base} ${variants[variant]} ${className}`} {...props}>{children}</button>;
+            return <button disabled={disabled} className={`${base} ${v[variant]} ${className}`} {...props}>{children}</button>;
         };
 
         // ── INPUT ──
-        const Input = ({ label, ...props }) => (
+        const Input = ({ label, hint, ...props }) => (
             <div className="flex flex-col gap-spacing-xs-mb">
-                {label && <label className="text-aura-small font-semibold text-text-body">{label}</label>}
-                <input className="w-full border border-line rounded-radius-md px-spacing-sm py-spacing-xs text-aura-small text-text-title bg-surface-main outline-none focus:ring-2 focus:ring-brand-primary focus:border-brand-primary transition-all" {...props} />
+                {label && <label className="text-aura-small font-semibold text-text-body">{label}{hint && <span className="text-line font-normal ml-1">({hint})</span>}</label>}
+                <input className="w-full border border-line rounded-radius-md px-spacing-sm py-spacing-xs text-aura-small text-text-title bg-surface-main outline-none focus:ring-2 focus:ring-brand-primary transition-all" {...props} />
             </div>
         );
 
-        const Textarea = ({ label, ...props }) => (
+        const Textarea = ({ label, hint, ...props }) => (
             <div className="flex flex-col gap-spacing-xs-mb">
-                {label && <label className="text-aura-small font-semibold text-text-body">{label}</label>}
-                <textarea className="w-full border border-line rounded-radius-md px-spacing-sm py-spacing-xs text-aura-small text-text-title bg-surface-main outline-none focus:ring-2 focus:ring-brand-primary focus:border-brand-primary transition-all resize-none" rows={3} {...props} />
+                {label && <label className="text-aura-small font-semibold text-text-body">{label}{hint && <span className="text-line font-normal ml-1">({hint})</span>}</label>}
+                <textarea className="w-full border border-line rounded-radius-md px-spacing-sm py-spacing-xs text-aura-small text-text-title bg-surface-main outline-none focus:ring-2 focus:ring-brand-primary transition-all resize-none" rows={3} {...props} />
             </div>
         );
 
         // ── LOGO ──
         const Logo = ({ white = false }) => (
-            <a href="/" className="flex items-center transition-transform hover:scale-105 active:scale-95">
+            <a href="https://auracuida.cl" className="flex items-center transition-transform hover:scale-105 active:scale-95">
                 <img src="./assets/logo-brand.png" alt="Aura Smartcare" className={`h-7 w-auto object-contain ${white ? 'brightness-0 invert' : ''}`} />
             </a>
         );
@@ -205,54 +202,125 @@
             const colors = { success: "bg-status-success", error: "bg-status-error", info: "bg-brand-primary" };
             return (
                 <div className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 ${colors[type]} text-white text-aura-small font-semibold px-spacing-sm py-spacing-xs rounded-radius-full shadow-card-hover flex items-center gap-spacing-xs toast-enter whitespace-nowrap`}>
-                    {type === "success" && <CheckCircle className="w-4 h-4" />}
-                    {type === "error" && <AlertCircle className="w-4 h-4" />}
-                    {type === "info" && <MapPin className="w-4 h-4" />}
+                    {type === "success" && <CheckCircle c="w-4 h-4" />}
+                    {type === "error" && <AlertCircle c="w-4 h-4" />}
+                    {type === "info" && <MapPin c="w-4 h-4" />}
                     {message}
                 </div>
             );
         };
 
-        // ════════════════════════════════════
+        // ── AVATAR UPLOAD ──
+        // Permite seleccionar foto y previsualizarla antes de subir
+        const AvatarUpload = ({ preview, onChange }) => {
+            const fileRef = useRef();
+            return (
+                <div className="flex flex-col items-center gap-spacing-xs">
+                    <div
+                        className="w-24 h-24 rounded-radius-full border-4 border-brand-secondary overflow-hidden bg-surface-secondary flex items-center justify-center cursor-pointer relative group"
+                        onClick={() => fileRef.current.click()}
+                    >
+                        {preview
+                            ? <img src={preview} alt="Preview" className="w-full h-full object-cover" />
+                            : <Camera c="w-8 h-8 text-line" />
+                        }
+                        <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-radius-full">
+                            <Camera c="w-6 h-6 text-white" />
+                        </div>
+                    </div>
+                    <p className="text-aura-small text-text-body">Toca para subir foto <span className="text-line">(opcional)</span></p>
+                    <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={onChange} />
+                </div>
+            );
+        };
+
+        // ════════════════════════════════════════
         // VISTA: CARGANDO
-        // ════════════════════════════════════
+        // ════════════════════════════════════════
         const ViewCargando = () => (
             <div className="flex flex-col items-center justify-center min-h-[400px] gap-spacing-sm">
-                <Loader className="w-10 h-10 text-brand-primary" />
+                <Loader c="w-10 h-10 text-brand-primary" />
                 <p className="text-aura-small text-text-body font-medium">Cargando ficha...</p>
             </div>
         );
 
-        // ════════════════════════════════════
+        // ════════════════════════════════════════
         // VISTA: ERROR
-        // ════════════════════════════════════
+        // ════════════════════════════════════════
         const ViewError = () => (
             <div className="flex flex-col items-center justify-center min-h-[400px] gap-spacing-sm px-container-padding-mb text-center">
-                <AlertCircle className="w-12 h-12 text-status-error" />
+                <AlertCircle c="w-12 h-12 text-status-error" />
                 <h2 className="text-aura-h4-mb font-heading font-bold text-text-title">ID no encontrado</h2>
-                <p className="text-aura-small text-text-body">Esta pulsera no está registrada en el sistema o el link es incorrecto.</p>
+                <p className="text-aura-small text-text-body">Esta pulsera no está registrada o el link es incorrecto.</p>
             </div>
         );
 
-        // ════════════════════════════════════
-        // VISTA: ACTIVACIÓN (primera vez)
-        // ════════════════════════════════════
+        // ════════════════════════════════════════
+        // VISTA: ACTIVACIÓN
+        // ════════════════════════════════════════
         const ViewActivacion = ({ currentId, onRegistrado }) => {
-            const [form, setForm] = useState({ nombre: '', alergias: '', contacto: '', pin: '', email: '' });
+            const [form, setForm] = useState({
+                nombre: '', edad: '', comuna: '', alergias: '',
+                grupo_sanguineo: '', padecimientos: '', notas: '',
+                contacto: '', pin: '', email: ''
+            });
+            const [fotoFile, setFotoFile] = useState(null);
+            const [preview, setPreview] = useState(null);
             const [loading, setLoading] = useState(false);
             const [error, setError] = useState('');
+
             const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+
+            const handleFoto = (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                setFotoFile(file);
+                setPreview(URL.createObjectURL(file));
+            };
 
             const handleSubmit = async (e) => {
                 e.preventDefault();
-                if (form.pin.length !== 4 || isNaN(form.pin)) { setError('El PIN debe ser de exactamente 4 dígitos numéricos.'); return; }
+                if (form.pin.length !== 4 || isNaN(form.pin)) {
+                    setError('El PIN debe ser de exactamente 4 dígitos numéricos.');
+                    return;
+                }
                 setLoading(true); setError('');
-                const { error } = await auraClient.from('pulseras').update({
-                    nombre_portador: form.nombre, alergias: form.alergias,
-                    contacto_emergencia: form.contacto, pin: form.pin,
-                    email_respaldo: form.email, registrada: true,
+
+                // 1. Subir foto si existe
+                let foto_url = null;
+                if (fotoFile) {
+                    const ext = fotoFile.name.split('.').pop();
+                    const fileName = `${currentId}.${ext}`;
+                    const { error: uploadError } = await auraClient.storage
+                        .from('avatars')
+                        .upload(fileName, fotoFile, { upsert: true });
+
+                    if (uploadError) {
+                        setError('Error al subir la foto: ' + uploadError.message);
+                        setLoading(false); return;
+                    }
+                    const { data: urlData } = auraClient.storage.from('avatars').getPublicUrl(fileName);
+                    foto_url = urlData.publicUrl;
+                }
+
+                // 2. Guardar datos en Supabase
+                const { error: dbError } = await auraClient.from('pulseras').update({
+                    nombre_portador: form.nombre,
+                    edad: form.edad,
+                    comuna: form.comuna,
+                    alergias: form.alergias,
+                    grupo_sanguineo: form.grupo_sanguineo,
+                    padecimientos: form.padecimientos,
+                    notas: form.notas,
+                    contacto_emergencia: form.contacto,
+                    pin: form.pin,
+                    email_respaldo: form.email,
+                    foto_url: foto_url,
+                    registrada: true,
                 }).eq('id_unico', currentId);
-                if (error) { setError(error.message); setLoading(false); } else { onRegistrado(); }
+
+                if (dbError) { setError(dbError.message); setLoading(false); }
+                else { onRegistrado(); }
             };
 
             return (
@@ -260,36 +328,66 @@
                     <div className="flex flex-col items-center text-center mb-spacing-md">
                         <Logo />
                         <div className="mt-spacing-sm w-14 h-14 rounded-radius-full bg-brand-secondary flex items-center justify-center mb-spacing-xs">
-                            <ShieldAlert className="w-7 h-7 text-brand-primary" />
+                            <ShieldAlert c="w-7 h-7 text-brand-primary" />
                         </div>
                         <h2 className="text-aura-h3-mb font-heading font-bold text-text-title">Activar Aura</h2>
-                        <p className="text-aura-small text-text-body mt-spacing-xs-mb">Vincula tu pulsera completando la información médica.</p>
+                        <p className="text-aura-small text-text-body mt-spacing-xs-mb max-w-xs">Vincula tu pulsera completando la información del portador.</p>
                     </div>
+
                     <form onSubmit={handleSubmit} className="space-y-spacing-xs">
-                        <Input label="Nombre completo del portador" name="nombre" required placeholder="Ej: Mateo García" value={form.nombre} onChange={handleChange} />
-                        <Textarea label="Alergias y condiciones médicas" name="alergias" required placeholder="Ej: Alergia a la penicilina, asma leve..." value={form.alergias} onChange={handleChange} />
+
+                        {/* Foto */}
+                        <AvatarUpload preview={preview} onChange={handleFoto} />
+
+                        {/* Separador */}
+                        <p className="text-aura-small font-bold text-text-title pt-spacing-xs-mb">Datos personales</p>
+
+                        <Input label="Nombre completo" name="nombre" required placeholder="Ej: Mateo García" value={form.nombre} onChange={handleChange} />
+
+                        <div className="grid grid-cols-2 gap-spacing-xs">
+                            <Input label="Edad" hint="opcional" name="edad" placeholder="Ej: 8 años" value={form.edad} onChange={handleChange} />
+                            <Input label="Comuna" hint="opcional" name="comuna" placeholder="Ej: Providencia" value={form.comuna} onChange={handleChange} />
+                        </div>
+
+                        {/* Separador */}
+                        <p className="text-aura-small font-bold text-text-title pt-spacing-xs-mb">Datos médicos</p>
+
+                        <Input label="Grupo sanguíneo" hint="opcional" name="grupo_sanguineo" placeholder="Ej: O+" value={form.grupo_sanguineo} onChange={handleChange} />
+                        <Textarea label="Alergias" name="alergias" required placeholder="Ej: Penicilina, maní..." value={form.alergias} onChange={handleChange} />
+                        <Textarea label="Padecimientos" hint="opcional" name="padecimientos" placeholder="Ej: TEA nivel 1, asma leve..." value={form.padecimientos} onChange={handleChange} />
+                        <Textarea label="Instrucciones adicionales" hint="opcional" name="notas" placeholder="Ej: Hablarle con voz calmada, le gustan los trenes..." value={form.notas} onChange={handleChange} />
+
+                        {/* Separador */}
+                        <p className="text-aura-small font-bold text-text-title pt-spacing-xs-mb">Contacto de emergencia</p>
+
                         <Input label="Teléfono de emergencia" name="contacto" required type="tel" placeholder="+56 9 1234 5678" value={form.contacto} onChange={handleChange} />
                         <Input label="Email de respaldo" name="email" required type="email" placeholder="tu@email.com" value={form.email} onChange={handleChange} />
-                        <Input label="PIN de seguridad (4 dígitos)" name="pin" required type="password" maxLength={4} placeholder="••••" value={form.pin} onChange={handleChange} />
-                        <p className="text-aura-small text-text-body">Este PIN lo necesitarás para editar la ficha. Guárdalo en un lugar seguro.</p>
+
+                        {/* Separador */}
+                        <p className="text-aura-small font-bold text-text-title pt-spacing-xs-mb">Seguridad</p>
+
+                        <Input label="PIN de 4 dígitos" name="pin" required type="password" maxLength={4} placeholder="••••" value={form.pin} onChange={handleChange} />
+                        <p className="text-aura-small text-text-body">Lo necesitarás para editar la ficha. Guárdalo en un lugar seguro.</p>
+
                         {error && (
                             <div className="flex items-center gap-spacing-xs bg-red-50 border border-status-error/20 rounded-radius-md px-spacing-xs py-spacing-xs-mb">
-                                <AlertCircle className="w-4 h-4 text-status-error shrink-0" />
+                                <AlertCircle c="w-4 h-4 text-status-error shrink-0" />
                                 <p className="text-aura-small text-status-error font-medium">{error}</p>
                             </div>
                         )}
-                        <Button type="submit" variant="primary" className="w-full py-spacing-sm text-aura-body-mb" disabled={loading}>
-                            {loading && <Loader className="w-5 h-5" />}
+
+                        <Btn type="submit" variant="primary" className="w-full py-spacing-sm text-aura-body-mb" disabled={loading}>
+                            {loading && <Loader c="w-5 h-5" />}
                             {loading ? 'Activando...' : 'Activar pulsera'}
-                        </Button>
+                        </Btn>
                     </form>
                 </div>
             );
         };
 
-        // ════════════════════════════════════
+        // ════════════════════════════════════════
         // VISTA: FICHA (solo lectura)
-        // ════════════════════════════════════
+        // ════════════════════════════════════════
         const ViewFicha = ({ data, onEditar, setToast }) => {
             const [locationState, setLocationState] = useState('idle');
 
@@ -307,7 +405,7 @@
                     },
                     (err) => {
                         const msgs = { 1: "Permiso denegado.", 2: "No se pudo obtener ubicación.", 3: "Tiempo agotado." };
-                        setToast({ message: msgs[err.code] || "Error de ubicación.", type: "error" });
+                        setToast({ message: msgs[err.code] || "Error.", type: "error" });
                         setLocationState('error');
                         setTimeout(() => setLocationState('idle'), 3000);
                     },
@@ -316,100 +414,146 @@
             };
 
             const locationBtn = {
-                idle: { label: "Compartir mi ubicación", icon: <MapPin className="w-5 h-5" />, variant: "secondary" },
-                loading: { label: "Obteniendo ubicación...", icon: <Loader className="w-5 h-5" />, variant: "secondary" },
-                done: { label: "¡Ubicación enviada!", icon: <CheckCircle className="w-5 h-5" />, variant: "success" },
-                error: { label: "Reintentar", icon: <MapPin className="w-5 h-5" />, variant: "secondary" },
+                idle: { label: "Compartir mi ubicación", icon: <MapPin c="w-5 h-5" />, variant: "secondary" },
+                loading: { label: "Obteniendo ubicación...", icon: <Loader c="w-5 h-5" />, variant: "secondary" },
+                done: { label: "¡Ubicación enviada!", icon: <CheckCircle c="w-5 h-5" />, variant: "success" },
+                error: { label: "Reintentar", icon: <MapPin c="w-5 h-5" />, variant: "secondary" },
             }[locationState];
+
+            // Avatar: foto subida o inicial del nombre
+            const avatarContent = data.foto_url
+                ? <img src={data.foto_url} alt="Foto" className="w-full h-full object-cover" />
+                : <span className="text-aura-h3-mb font-bold text-white">{data.nombre_portador?.charAt(0).toUpperCase()}</span>;
 
             return (
                 <div className="fade-in">
-                    {/* HEADER AZUL */}
+                    {/* ── HEADER AZUL ── */}
                     <div className="bg-brand-primary pt-spacing-sm pb-spacing-2xl-mb px-container-padding-mb rounded-b-radius-xl relative overflow-hidden shadow-lg">
                         <div className="absolute top-[-20%] right-[-20%] w-[60%] h-[80%] bg-white/10 rounded-full blur-[80px] pointer-events-none"></div>
                         <div className="absolute top-[30%] left-[-10%] w-[40%] h-[40%] bg-cta/10 rounded-full blur-[60px] pointer-events-none"></div>
+
                         <div className="relative z-10 flex flex-col items-center">
                             <div className="w-full flex justify-between items-center mb-spacing-md-mb">
                                 <Logo white />
                                 <div className="flex items-center gap-spacing-xs">
                                     <span className="bg-status-error/20 text-red-100 text-[10px] px-spacing-xs py-1 rounded-radius-full font-bold uppercase tracking-wider border border-status-error/30 flex items-center gap-1 animate-pulse">
-                                        <AlertCircle className="w-3 h-3" /> Perfil Médico
+                                        <AlertCircle c="w-3 h-3" /> Perfil Médico
                                     </span>
-                                    {/* BOTÓN CONFIGURAR */}
                                     <button onClick={onEditar} className="w-8 h-8 rounded-radius-full bg-white/10 border border-white/20 flex items-center justify-center text-white hover:bg-white/20 transition-all cursor-pointer" title="Editar ficha">
-                                        <Settings className="w-4 h-4" />
+                                        <Settings c="w-4 h-4" />
                                     </button>
                                 </div>
                             </div>
-                            <div className="w-28 h-28 rounded-radius-full border-4 border-white/20 overflow-hidden shadow-2xl mb-spacing-xs">
-                                <img src="https://i.pravatar.cc/150?img=11" alt="Foto de Perfil" className="w-full h-full object-cover" />
+
+                            {/* Avatar */}
+                            <div className="w-28 h-28 rounded-radius-full border-4 border-white/20 overflow-hidden shadow-2xl mb-spacing-xs bg-brand-secondary flex items-center justify-center">
+                                {avatarContent}
                             </div>
-                            <h1 className="text-aura-h3-mb font-heading font-bold text-white text-center leading-tight mb-spacing-xs-mb">{data.nombre_portador}</h1>
-                            <p className="text-brand-secondary text-aura-small font-medium">Perfil de emergencia activo</p>
+
+                            <h1 className="text-aura-h3-mb font-heading font-bold text-white text-center leading-tight mb-spacing-xs-mb">
+                                {data.nombre_portador}
+                            </h1>
+                            {/* Edad y comuna opcionales */}
+                            {(data.edad || data.comuna) && (
+                                <p className="text-brand-secondary text-aura-small font-medium">
+                                    {[data.edad, data.comuna].filter(Boolean).join(' • ')}
+                                </p>
+                            )}
                         </div>
                     </div>
 
-                    {/* CONTENIDO */}
+                    {/* ── CONTENIDO ── */}
                     <div className="px-container-padding-mb md:px-spacing-md -mt-spacing-md relative z-20 space-y-spacing-xs">
-                        {/* Llamada emergencia */}
-                        <div className="bg-surface-main rounded-radius-lg p-spacing-sm premium-shadow border border-line flex flex-col items-center text-center">
-                            <p className="text-aura-small text-text-body mb-spacing-xs leading-relaxed font-medium">Si lo has encontrado, mantén la calma y comunícate con sus familiares.</p>
+
+                        {/* Tarjeta llamada + ubicación */}
+                        <div className="bg-surface-main rounded-radius-lg p-spacing-sm premium-shadow border border-line flex flex-col items-center text-center gap-spacing-xs">
+                            <p className="text-aura-small text-text-body leading-relaxed font-medium">
+                                Si lo has encontrado, mantén la calma y comunícate con sus familiares de inmediato.
+                            </p>
                             <a href={`tel:${data.contacto_emergencia}`} className="w-full">
-                                <Button variant="danger" className="w-full py-spacing-sm text-aura-body-mb">
-                                    <Phone className="w-5 h-5 fill-current" /> Llamar a emergencias
-                                </Button>
+                                <Btn variant="danger" className="w-full py-spacing-sm text-aura-body-mb">
+                                    <Phone c="w-5 h-5 fill-current" /> Llamar a contacto de emergencia
+                                </Btn>
                             </a>
+                            <Btn
+                                variant={locationBtn.variant}
+                                className="w-full py-spacing-sm text-aura-body-mb"
+                                onClick={handleUbicacion}
+                                disabled={locationState === 'loading'}
+                            >
+                                {locationBtn.icon} {locationBtn.label}
+                            </Btn>
                         </div>
 
+                        {/* Datos vitales */}
                         <h2 className="text-aura-sub-mb font-heading font-bold text-text-title pl-spacing-xs-mb pt-spacing-xs">Datos Vitales</h2>
 
-                        {/* Alergias desde Supabase */}
-                        <div className="bg-orange-50 rounded-radius-lg p-spacing-sm border border-orange-100 flex flex-col hover:bg-orange-100/40 transition-colors">
-                            <div className="flex items-center gap-spacing-xs mb-spacing-xs">
-                                <div className="w-10 h-10 rounded-radius-full bg-orange-100 text-status-warning flex items-center justify-center">
-                                    <ShieldAlert className="w-5 h-5" />
+                        {/* Grid: grupo sanguíneo + alergias */}
+                        <div className="grid grid-cols-2 gap-spacing-xs">
+                            {data.grupo_sanguineo && (
+                                <div className="bg-red-50 rounded-radius-lg p-spacing-sm border border-red-100 flex flex-col hover:bg-red-100/40 transition-colors">
+                                    <div className="w-10 h-10 rounded-radius-full bg-red-100 text-status-error flex items-center justify-center mb-spacing-xs">
+                                        <BloodDrop c="w-5 h-5" />
+                                    </div>
+                                    <span className="text-[11px] text-status-error font-bold uppercase tracking-wider mb-spacing-xs-mb">Grupo Sanguíneo</span>
+                                    <span className="text-aura-h3-mb font-heading font-bold text-red-900">{data.grupo_sanguineo}</span>
                                 </div>
-                                <span className="text-aura-small text-orange-900 font-bold uppercase tracking-wider">Alergias y condiciones</span>
-                            </div>
-                            <p className="text-aura-body-mb font-heading font-bold text-orange-900 leading-snug">{data.alergias}</p>
+                            )}
+                            {data.alergias && (
+                                <div className="bg-orange-50 rounded-radius-lg p-spacing-sm border border-orange-100 flex flex-col hover:bg-orange-100/40 transition-colors">
+                                    <div className="w-10 h-10 rounded-radius-full bg-orange-100 text-status-warning flex items-center justify-center mb-spacing-xs">
+                                        <ShieldAlert c="w-5 h-5" />
+                                    </div>
+                                    <span className="text-[11px] text-status-warning font-bold uppercase tracking-wider mb-spacing-xs-mb">Alergias</span>
+                                    <span className="text-aura-body-mb font-heading font-bold text-orange-900 leading-tight">{data.alergias}</span>
+                                </div>
+                            )}
                         </div>
 
-                        {/* Notas opcionales */}
+                        {/* Padecimientos */}
+                        {data.padecimientos && (
+                            <div className="bg-blue-50 rounded-radius-lg p-spacing-sm border border-blue-100 flex flex-col hover:bg-blue-100/40 transition-colors">
+                                <div className="flex items-center gap-spacing-xs mb-spacing-xs">
+                                    <div className="w-10 h-10 rounded-radius-full bg-blue-100 text-status-info flex items-center justify-center">
+                                        <Activity c="w-5 h-5" />
+                                    </div>
+                                    <span className="text-aura-small text-blue-900 font-bold uppercase tracking-wider">Padecimientos</span>
+                                </div>
+                                <p className="text-aura-small font-medium text-blue-900 leading-relaxed">{data.padecimientos}</p>
+                            </div>
+                        )}
+
+                        {/* Instrucciones adicionales */}
                         {data.notas && (
                             <div className="bg-surface-main rounded-radius-lg p-spacing-sm premium-shadow border border-line relative overflow-hidden">
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-cta/5 rounded-full blur-3xl pointer-events-none"></div>
                                 <h3 className="text-aura-small text-text-body font-bold uppercase tracking-wider mb-spacing-xs flex items-center gap-spacing-xs-mb">
-                                    <Info className="w-4 h-4 text-cta" /> Instrucciones adicionales
+                                    <Info c="w-4 h-4 text-cta" /> Instrucciones adicionales
                                 </h3>
                                 <p className="text-text-title font-medium leading-relaxed text-aura-small">{data.notas}</p>
                             </div>
                         )}
 
-                        {/* Botones */}
-                        <div className="pt-spacing-xs flex flex-col gap-spacing-xs">
-                            <Button variant={locationBtn.variant} className="w-full py-spacing-sm text-aura-body-mb" onClick={handleUbicacion} disabled={locationState === 'loading'}>
-                                {locationBtn.icon} {locationBtn.label}
-                            </Button>
-                            <Button variant="secondary" className="w-full py-spacing-sm text-aura-body-mb" onClick={() => {
-                                if (navigator.share) { navigator.share({ title: `Perfil - ${data.nombre_portador}`, url: window.location.href }); }
-                                else { navigator.clipboard.writeText(window.location.href); setToast({ message: "Link copiado.", type: "info" }); }
-                            }}>
-                                <Share className="w-5 h-5" /> Compartir esta ficha
-                            </Button>
-                        </div>
+                        {/* Botón Carabineros */}
+                        <a href="tel:133" className="block w-full">
+                            <Btn variant="dark" className="w-full py-spacing-sm text-aura-body-mb">
+                                <Phone c="w-5 h-5" /> Llamar a Carabineros (133)
+                            </Btn>
+                        </a>
 
-                        <div className="w-full flex justify-center py-spacing-sm">
-                            <p className="text-aura-small text-text-body font-medium flex items-center gap-spacing-xs-mb">
-                                Protegido por <span className="font-heading font-bold text-text-title">AURA</span>
-                            </p>
+                        {/* Footer — logo como link */}
+                        <div className="w-full flex justify-center items-center gap-spacing-xs py-spacing-sm">
+                            <p className="text-aura-small text-text-body font-medium">Protegido por</p>
+                            <Logo />
                         </div>
                     </div>
                 </div>
             );
         };
 
-        // ════════════════════════════════════
-        // VISTA: SOLICITAR PIN
-        // ════════════════════════════════════
+        // ════════════════════════════════════════
+        // VISTA: PIN
+        // ════════════════════════════════════════
         const ViewPin = ({ data, onPinCorrecto, onCancelar }) => {
             const [pin, setPin] = useState('');
             const [error, setError] = useState('');
@@ -423,7 +567,7 @@
             return (
                 <div className="fade-in flex flex-col items-center justify-center min-h-[400px] px-container-padding-mb py-spacing-md">
                     <div className="w-14 h-14 rounded-radius-full bg-brand-secondary flex items-center justify-center mb-spacing-sm">
-                        <Settings className="w-7 h-7 text-brand-primary" />
+                        <Settings c="w-7 h-7 text-brand-primary" />
                     </div>
                     <h2 className="text-aura-h4-mb font-heading font-bold text-text-title mb-spacing-xs text-center">Ingresa tu PIN</h2>
                     <p className="text-aura-small text-text-body text-center mb-spacing-md">Necesitas el PIN que creaste al activar la pulsera.</p>
@@ -436,35 +580,74 @@
                         />
                         {error && (
                             <div className="flex items-center gap-spacing-xs bg-red-50 border border-status-error/20 rounded-radius-md px-spacing-xs py-spacing-xs-mb">
-                                <AlertCircle className="w-4 h-4 text-status-error shrink-0" />
+                                <AlertCircle c="w-4 h-4 text-status-error shrink-0" />
                                 <p className="text-aura-small text-status-error font-medium">{error}</p>
                             </div>
                         )}
-                        <Button type="submit" variant="primary" className="w-full py-spacing-sm text-aura-body-mb">Confirmar</Button>
-                        <Button type="button" variant="ghost" className="w-full py-spacing-sm text-aura-body-mb" onClick={onCancelar}>
-                            <ArrowLeft className="w-4 h-4" /> Cancelar
-                        </Button>
+                        <Btn type="submit" variant="primary" className="w-full py-spacing-sm">Confirmar</Btn>
+                        <Btn type="button" variant="ghost" className="w-full py-spacing-sm" onClick={onCancelar}>
+                            <ArrowLeft c="w-4 h-4" /> Cancelar
+                        </Btn>
                     </form>
                 </div>
             );
         };
 
-        // ════════════════════════════════════
+        // ════════════════════════════════════════
         // VISTA: EDITAR
-        // ════════════════════════════════════
+        // ════════════════════════════════════════
         const ViewEditar = ({ data, currentId, onGuardado, onCancelar, setToast }) => {
-            const [form, setForm] = useState({ nombre: data.nombre_portador, alergias: data.alergias, contacto: data.contacto_emergencia, notas: data.notas || '' });
+            const [form, setForm] = useState({
+                nombre: data.nombre_portador || '',
+                edad: data.edad || '',
+                comuna: data.comuna || '',
+                alergias: data.alergias || '',
+                grupo_sanguineo: data.grupo_sanguineo || '',
+                padecimientos: data.padecimientos || '',
+                notas: data.notas || '',
+                contacto: data.contacto_emergencia || '',
+            });
+            const [fotoFile, setFotoFile] = useState(null);
+            const [preview, setPreview] = useState(data.foto_url || null);
             const [loading, setLoading] = useState(false);
             const [error, setError] = useState('');
+
             const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
+            const handleFoto = (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                setFotoFile(file);
+                setPreview(URL.createObjectURL(file));
+            };
+
             const handleSubmit = async (e) => {
-                e.preventDefault(); setLoading(true); setError('');
-                const { error } = await auraClient.from('pulseras').update({
-                    nombre_portador: form.nombre, alergias: form.alergias,
-                    contacto_emergencia: form.contacto, notas: form.notas,
+                e.preventDefault();
+                setLoading(true); setError('');
+
+                let foto_url = data.foto_url;
+                if (fotoFile) {
+                    const ext = fotoFile.name.split('.').pop();
+                    const fileName = `${currentId}.${ext}`;
+                    const { error: uploadError } = await auraClient.storage.from('avatars').upload(fileName, fotoFile, { upsert: true });
+                    if (uploadError) { setError('Error al subir la foto.'); setLoading(false); return; }
+                    const { data: urlData } = auraClient.storage.from('avatars').getPublicUrl(fileName);
+                    foto_url = urlData.publicUrl;
+                }
+
+                const { error: dbError } = await auraClient.from('pulseras').update({
+                    nombre_portador: form.nombre,
+                    edad: form.edad,
+                    comuna: form.comuna,
+                    alergias: form.alergias,
+                    grupo_sanguineo: form.grupo_sanguineo,
+                    padecimientos: form.padecimientos,
+                    notas: form.notas,
+                    contacto_emergencia: form.contacto,
+                    foto_url: foto_url,
                 }).eq('id_unico', currentId);
-                if (error) { setError(error.message); setLoading(false); }
+
+                if (dbError) { setError(dbError.message); setLoading(false); }
                 else { setToast({ message: "Ficha actualizada correctamente.", type: "success" }); onGuardado(); }
             };
 
@@ -472,36 +655,51 @@
                 <div className="fade-in px-container-padding-mb py-spacing-md">
                     <div className="flex items-center gap-spacing-xs mb-spacing-md">
                         <button onClick={onCancelar} className="w-8 h-8 rounded-radius-full bg-surface-secondary border border-line flex items-center justify-center text-text-body hover:bg-surface-main transition-all cursor-pointer">
-                            <ArrowLeft className="w-4 h-4" />
+                            <ArrowLeft c="w-4 h-4" />
                         </button>
                         <h2 className="text-aura-sub-mb font-heading font-bold text-text-title">Editar ficha</h2>
                     </div>
+
                     <form onSubmit={handleSubmit} className="space-y-spacing-xs">
+                        <AvatarUpload preview={preview} onChange={handleFoto} />
+
+                        <p className="text-aura-small font-bold text-text-title pt-spacing-xs-mb">Datos personales</p>
                         <Input label="Nombre completo" name="nombre" required value={form.nombre} onChange={handleChange} />
-                        <Textarea label="Alergias y condiciones médicas" name="alergias" required value={form.alergias} onChange={handleChange} />
+                        <div className="grid grid-cols-2 gap-spacing-xs">
+                            <Input label="Edad" hint="opcional" name="edad" value={form.edad} onChange={handleChange} />
+                            <Input label="Comuna" hint="opcional" name="comuna" value={form.comuna} onChange={handleChange} />
+                        </div>
+
+                        <p className="text-aura-small font-bold text-text-title pt-spacing-xs-mb">Datos médicos</p>
+                        <Input label="Grupo sanguíneo" hint="opcional" name="grupo_sanguineo" value={form.grupo_sanguineo} onChange={handleChange} />
+                        <Textarea label="Alergias" name="alergias" required value={form.alergias} onChange={handleChange} />
+                        <Textarea label="Padecimientos" hint="opcional" name="padecimientos" value={form.padecimientos} onChange={handleChange} />
+                        <Textarea label="Instrucciones adicionales" hint="opcional" name="notas" value={form.notas} onChange={handleChange} />
+
+                        <p className="text-aura-small font-bold text-text-title pt-spacing-xs-mb">Contacto de emergencia</p>
                         <Input label="Teléfono de emergencia" name="contacto" required type="tel" value={form.contacto} onChange={handleChange} />
-                        <Textarea label="Instrucciones adicionales (opcional)" name="notas" placeholder="Ej: Tiene miedo a los perros..." value={form.notas} onChange={handleChange} />
+
                         {error && (
                             <div className="flex items-center gap-spacing-xs bg-red-50 border border-status-error/20 rounded-radius-md px-spacing-xs py-spacing-xs-mb">
-                                <AlertCircle className="w-4 h-4 text-status-error shrink-0" />
+                                <AlertCircle c="w-4 h-4 text-status-error shrink-0" />
                                 <p className="text-aura-small text-status-error font-medium">{error}</p>
                             </div>
                         )}
-                        <Button type="submit" variant="primary" className="w-full py-spacing-sm text-aura-body-mb" disabled={loading}>
-                            {loading ? <Loader className="w-5 h-5" /> : <CheckCircle className="w-5 h-5" />}
+
+                        <Btn type="submit" variant="primary" className="w-full py-spacing-sm text-aura-body-mb" disabled={loading}>
+                            {loading ? <Loader c="w-5 h-5" /> : <CheckCircle c="w-5 h-5" />}
                             {loading ? 'Guardando...' : 'Guardar cambios'}
-                        </Button>
-                        <Button type="button" variant="ghost" className="w-full py-spacing-sm text-aura-body-mb" onClick={onCancelar}>Cancelar</Button>
+                        </Btn>
+                        <Btn type="button" variant="ghost" className="w-full py-spacing-sm text-aura-body-mb" onClick={onCancelar}>Cancelar</Btn>
                     </form>
                 </div>
             );
         };
 
-        // ════════════════════════════════════
-        // COMPONENTE PRINCIPAL — maneja vistas
-        // ════════════════════════════════════
+        // ════════════════════════════════════════
+        // COMPONENTE PRINCIPAL
+        // ════════════════════════════════════════
         const AuraFicha = () => {
-            // vistas: 'cargando' | 'error' | 'activacion' | 'ficha' | 'pin' | 'editar'
             const [vista, setVista] = useState('cargando');
             const [data, setData] = useState(null);
             const [currentId, setCurrentId] = useState(null);
@@ -525,7 +723,7 @@
             const recargar = () => cargarDatos(currentId);
 
             return (
-                <div className="bg-surface-secondary min-h-screen font-body pb-spacing-lg w-full max-w-lg mx-auto md:shadow-2xl md:min-h-[800px] md:my-spacing-sm md:rounded-radius-xl overflow-hidden relative border border-line">
+                <div className="bg-surface-secondary min-h-screen font-body pb-spacing-lg w-full max-w-lg mx-auto md:shadow-2xl md:my-spacing-sm md:rounded-radius-xl overflow-hidden relative border border-line">
                     {vista === 'cargando' && <ViewCargando />}
                     {vista === 'error' && <ViewError />}
                     {vista === 'activacion' && <ViewActivacion currentId={currentId} onRegistrado={recargar} />}
