@@ -490,50 +490,49 @@
 
                         {/* Grid: grupo sanguíneo + alergias */}
                         <div className="grid grid-cols-2 gap-spacing-xs">
-                            {data.grupo_sanguineo && (
-                                <div className="bg-red-50 rounded-radius-lg p-spacing-sm border border-red-100 flex flex-col hover:bg-red-100/40 transition-colors">
-                                    <div className="w-10 h-10 rounded-radius-full bg-red-100 text-status-error flex items-center justify-center mb-spacing-xs">
-                                        <BloodDrop c="w-5 h-5" />
-                                    </div>
-                                    <span className="text-[11px] text-status-error font-bold uppercase tracking-wider mb-spacing-xs-mb">Grupo Sanguíneo</span>
-                                    <span className="text-aura-h3-mb font-heading font-bold text-red-900">{data.grupo_sanguineo}</span>
+                            <div className="bg-red-50 rounded-radius-lg p-spacing-sm border border-red-100 flex flex-col">
+                                <div className="w-10 h-10 rounded-radius-full bg-red-100 text-status-error flex items-center justify-center mb-spacing-xs">
+                                    <BloodDrop c="w-5 h-5" />
                                 </div>
-                            )}
-                            {data.alergias && (
-                                <div className="bg-orange-50 rounded-radius-lg p-spacing-sm border border-orange-100 flex flex-col hover:bg-orange-100/40 transition-colors">
-                                    <div className="w-10 h-10 rounded-radius-full bg-orange-100 text-status-warning flex items-center justify-center mb-spacing-xs">
-                                        <ShieldAlert c="w-5 h-5" />
-                                    </div>
-                                    <span className="text-[11px] text-status-warning font-bold uppercase tracking-wider mb-spacing-xs-mb">Alergias</span>
-                                    <span className="text-aura-body-mb font-heading font-bold text-orange-900 leading-tight">{data.alergias}</span>
+                                <span className="text-[11px] text-status-error font-bold uppercase tracking-wider mb-spacing-xs-mb">Grupo Sanguíneo</span>
+                                <span className="text-aura-h3-mb font-heading font-bold text-red-900">
+                                    {data.grupo_sanguineo || <span className="text-line text-aura-small font-normal">No registrado</span>}
+                                </span>
+                            </div>
+                            <div className="bg-orange-50 rounded-radius-lg p-spacing-sm border border-orange-100 flex flex-col">
+                                <div className="w-10 h-10 rounded-radius-full bg-orange-100 text-status-warning flex items-center justify-center mb-spacing-xs">
+                                    <ShieldAlert c="w-5 h-5" />
                                 </div>
-                            )}
+                                <span className="text-[11px] text-status-warning font-bold uppercase tracking-wider mb-spacing-xs-mb">Alergias</span>
+                                <span className="text-aura-body-mb font-heading font-bold text-orange-900 leading-tight">
+                                    {data.alergias || <span className="text-line text-aura-small font-normal">No registrado</span>}
+                                </span>
+                            </div>
                         </div>
 
                         {/* Padecimientos */}
-                        {data.padecimientos && (
-                            <div className="bg-blue-50 rounded-radius-lg p-spacing-sm border border-blue-100 flex flex-col hover:bg-blue-100/40 transition-colors">
-                                <div className="flex items-center gap-spacing-xs mb-spacing-xs">
-                                    <div className="w-10 h-10 rounded-radius-full bg-blue-100 text-status-info flex items-center justify-center">
-                                        <Activity c="w-5 h-5" />
-                                    </div>
-                                    <span className="text-aura-small text-blue-900 font-bold uppercase tracking-wider">Padecimientos</span>
+                        <div className="bg-blue-50 rounded-radius-lg p-spacing-sm border border-blue-100 flex flex-col">
+                            <div className="flex items-center gap-spacing-xs mb-spacing-xs">
+                                <div className="w-10 h-10 rounded-radius-full bg-blue-100 text-status-info flex items-center justify-center">
+                                    <Activity c="w-5 h-5" />
                                 </div>
-                                <p className="text-aura-small font-medium text-blue-900 leading-relaxed">{data.padecimientos}</p>
+                                <span className="text-aura-small text-blue-900 font-bold uppercase tracking-wider">Padecimientos</span>
                             </div>
-                        )}
+                            <p className="text-aura-small font-medium text-blue-900 leading-relaxed">
+                                {data.padecimientos || <span className="text-line font-normal">No registrado</span>}
+                            </p>
+                        </div>
 
                         {/* Instrucciones adicionales */}
-                        {data.notas && (
-                            <div className="bg-surface-main rounded-radius-lg p-spacing-sm premium-shadow border border-line relative overflow-hidden">
-                                <div className="absolute top-0 right-0 w-32 h-32 bg-cta/5 rounded-full blur-3xl pointer-events-none"></div>
-                                <h3 className="text-aura-small text-text-body font-bold uppercase tracking-wider mb-spacing-xs flex items-center gap-spacing-xs-mb">
-                                    <Info c="w-4 h-4 text-cta" /> Instrucciones adicionales
-                                </h3>
-                                <p className="text-text-title font-medium leading-relaxed text-aura-small">{data.notas}</p>
-                            </div>
-                        )}
-
+                        <div className="bg-surface-main rounded-radius-lg p-spacing-sm premium-shadow border border-line relative overflow-hidden">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-cta/5 rounded-full blur-3xl pointer-events-none"></div>
+                            <h3 className="text-aura-small text-text-body font-bold uppercase tracking-wider mb-spacing-xs flex items-center gap-spacing-xs-mb">
+                                <Info c="w-4 h-4 text-cta" /> Instrucciones adicionales
+                            </h3>
+                            <p className="text-text-title font-medium leading-relaxed text-aura-small">
+                                {data.notas || <span className="text-line font-normal">No registrado</span>}
+                            </p>
+                        </div>
                         {/* Botón Carabineros */}
                         <a href="tel:133" className="block w-full">
                             <Btn variant="dark" className="w-full py-spacing-sm text-aura-body-mb">
